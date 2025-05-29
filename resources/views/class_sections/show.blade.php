@@ -69,7 +69,7 @@
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{{ __('messages.are_you_sure') }}')">{{ __('messages.delete') }}</button>
                                         </form>
-                                        <a href="{{ route('student.class_sections.edit', $student->id) }}" class="btn btn-secondary btn-sm">{{ __('messages.move') }}</a>
+                                        <a href="{{ route('student.class_sections.edit', $student->student_id) }}" class="btn btn-secondary btn-sm">{{ __('messages.move') }}</a>
                                     </td>
                                 </tr>
                             @endforeach

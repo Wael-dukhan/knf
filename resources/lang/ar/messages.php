@@ -237,5 +237,11 @@ return [
     'next_day' => 'التالي',
     'teacher_attendance_log' => 'سجل حضور المعلمين',
     'attendance_for_teachers' => 'حضور المعلمين',
-    'view_class_sections' => 'عرض الشعب الدراسية'
+    'view_class_sections' => 'عرض الشعب الدراسية',
+    'transfer_student' => 'نقل الطالب إلى شعبة أخرى',
+    'current_section' => 'الشعبة الحالية',
+    'not_registered' => 'غير مسجل',
+    'select_new_section' => 'اختر الشعبة الجديدة',
+    'transfer' => 'نقل الطالب',
+
 ];
