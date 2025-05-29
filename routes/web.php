@@ -40,13 +40,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/cc', function () {
-    return view('cc',[
-        'x' => 'cc',
-    ]);
-});
-
-
 Route::group(['middleware' => ['web']], function () {
     Route::get('/set-locale/{locale}', function ($locale) {
         if (in_array($locale, ['en', 'ar'])) {
