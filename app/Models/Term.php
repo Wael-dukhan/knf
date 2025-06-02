@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class Term extends Model
 {
@@ -41,4 +42,21 @@ class Term extends Model
         return $this->hasMany(MaterialUserTermSection::class);
     }
 
+    
+    public static function currentTermId($schoolId = null)
+    {
+        $today = time();
+
+        $query = Term::with('academicYear')
+            ->where('start_date', '<=', $today)
+            ->where('end_date', '>=', $today);
+
+        if ($schoolId) {
+            $query->where('school_id', $schoolId);
+        }
+
+        $term = $query->first();
+
+        return $term?->id; // ترجع null إذا لم يوجد فصل حالي
+    }
 }

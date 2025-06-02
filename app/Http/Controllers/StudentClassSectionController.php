@@ -77,7 +77,10 @@ class StudentClassSectionController extends Controller
         }
 
         // إضافة إلى الشعبة الجديدة
-        $student->classSections()->attach($request->class_section_id);
+        $student->classSections()->attach($request->class_section_id, [
+            'academic_year_id' => $request->academic_year_id,
+            'status' => 'active',
+        ]);
 
         return redirect()->route('admin.class_sections.show', $request->class_section_id)
             ->with('success', 'تم نقل الطالب إلى الشعبة الجديدة بنجاح.');
@@ -100,8 +103,13 @@ class StudentClassSectionController extends Controller
         $studentIds = $request->student_id;
     
         // إضافة الطلاب إلى الشعبة
-        $classSection->users()->attach($studentIds);
-    
+        // $classSection->users()->attach($studentIds);
+        foreach ($request->student_id as $studentId) {
+            $classSection->users()->attach($studentId, [
+                'academic_year_id' => $classSection->grade->academic_year_id, // استخدام السنة الدراسية المرتبطة بالصف
+                'status' => 'active',
+            ]);
+        }    
         return redirect()->route('admin.class_sections.show', $classSection->id)
             ->with('success', __('messages.assigned_successfully'));
     }

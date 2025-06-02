@@ -12,7 +12,7 @@ class StudentClassSection extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $fillable = ['user_id', 'class_section_id','status'];
+    protected $fillable = ['user_id', 'class_section_id','status','academic_year_id'];
 
     public function user()
     {
@@ -24,4 +24,8 @@ class StudentClassSection extends Model
         return $this->belongsTo(ClassSection::class);
     }
     
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
 }

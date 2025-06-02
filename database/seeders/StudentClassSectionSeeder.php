@@ -5,7 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\ClassSection;
-use Carbon\Carbon;  // لاستخدام الوقت الحالي
+use App\Models\StudentClassSection;
+use Carbon\Carbon;
 
 class StudentClassSectionSeeder extends Seeder
 {
@@ -14,24 +15,41 @@ class StudentClassSectionSeeder extends Seeder
      */
     public function run(): void
     {
-        // الحصول على جميع الشُعب
-        $classSections = ClassSection::all();
-
-        // التأكد من وجود طلاب في قاعدة البيانات باستخدام الحزمة spatie
-        $students = User::role('student')->get(); // استخدام role() للحصول على الطلاب
+        // جلب جميع الشُعب الدراسية
+        $classSections = ClassSection::with('grade')->get();
 
         // الوقت الحالي
         $currentTime = Carbon::now();
 
-        foreach ($students as $student) {
-            // اختيار شعبة عشوائية من الشُعب المتاحة
-            $randomClassSection = $classSections->random();
+        foreach ($classSections as $classSection) {
+            $academicYearId = $classSection->grade->academic_year_id;
 
-            // ربط الطالب بالشعبة العشوائية مع إضافة created_at و updated_at
-            $student->classSections()->attach($randomClassSection->id, [
-                'created_at' => $currentTime,
-                'updated_at' => $currentTime,
-            ]);
+            if (!$academicYearId) {
+                $this->command->warn("الشعبة {$classSection->id} لا تحتوي على سنة دراسية.");
+                continue;
+            }
+
+            // جلب عدد عشوائي من الطلاب (مثلاً 5 لكل شعبة)
+            $students = User::role('student')
+                ->where('school_id', $classSection->grade->school_id)
+                ->whereDoesntHave('classSections', function ($query) use ($academicYearId) {
+                    $query->where('student_class_section.academic_year_id', $academicYearId);
+                })
+                ->inRandomOrder()
+                ->take(5)
+                ->get();
+
+            foreach ($students as $student) {
+                // ربط الطالب بالشعبة
+                $student->classSections()->attach($classSection->id, [
+                    'academic_year_id' => $academicYearId,
+                    'status' => 'active',
+                    'created_at' => $currentTime,
+                    'updated_at' => $currentTime,
+                ]);
+
+                $this->command->info("تم تعيين الطالب {$student->id} للشعبة {$classSection->id} للسنة الدراسية {$academicYearId}");
+            }
         }
     }
 }

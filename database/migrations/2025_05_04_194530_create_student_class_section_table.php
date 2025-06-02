@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // ربط الطالب
             $table->foreignId('class_section_id')->constrained()->onDelete('cascade'); // ربط الشعبة
+            $table->foreignId('academic_year_id')->constrained('academic_years')->onDelete('cascade'); // ربط السنة الدراسية
             $table->enum('status', [
                 'active',
                 'dropout', // متسرب
