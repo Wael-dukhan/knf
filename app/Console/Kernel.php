@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('attendance:mark-default-present-for-students')->dailyAt('02:00');
+        $schedule->command('attendance:mark-default-present-for-students')->dailyAt('00:00');
+        $schedule->command('attendance:mark-default-present-for-teachers')->dailyAt('01:00');
 
     }
 
