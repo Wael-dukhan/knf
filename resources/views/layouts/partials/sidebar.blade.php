@@ -155,32 +155,37 @@
                             class="{{ request()->routeIs('students.parents.index') ? 'active' : '' }}"
                             >{{ __('messages.parent_list') }}</a>
                         </li>
-                        {{-- <li>
-                            <a href="{{ route('students.parents.create') }}"
-                                class="{{ request()->routeIs('students.parents.create') ? 'active' : '' }}"
-                                >{{ __('messages.assign_parent') }}</a
-                            > --}}
                         </li>
                     </ul>
                 </li>
 
                 
-                {{-- <li class="submenu">
+                <li class="submenu active">
                     <a href="#"
                         ><i class="fa fa-newspaper"></i>
-                        <span> Blogs</span>
+                        <span> حلقات القرآن</span>
                         <span class="menu-arrow"></span>
                     </a>
                     <ul>
-                        <li><a href="blog.html">All Blogs</a></li>
+                        <li><a href="{{ route('quran-levels.index') }}"
+                            class="{{ request()->routeIs('quran-levels.index') ? 'active' : '' }}"
+                            >{{__('messages.all_quran_levels')}}</a></li>
                         <li>
-                            <a href="add-blog.html">Add Blog</a>
+                        <li><a href="{{ route('quran-classes.index') }}"
+                            class="{{ request()->routeIs('quran-classes.index') ? 'active' : '' }}"
+                            >{{__('messages.all_quran_classes')}}</a></li>
+                        <li>
+                            <a href="{{ route('quran-levels.create') }}"
+                            class="{{ request()->routeIs('quran-levels.create') ? 'active' : '' }}"
+                            >{{__('messages.create_quran_level')}}</a>
                         </li>
                         <li>
-                            <a href="edit-blog.html">Edit Blog</a>
+                            <a href="{{ route('quran-classes.create') }}"
+                            class="{{ request()->routeIs('quran-classes.create') ? 'active' : '' }}"
+                            >{{__('messages.create_quran_class')}}</a>
                         </li>
                     </ul>
-                </li> --}}
+                </li>
                 {{-- <li>
                     <a href="settings.html"
                         ><i class="fas fa-cog"></i>

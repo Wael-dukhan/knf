@@ -134,12 +134,13 @@ class StudentClassSectionController extends Controller
     //         ->with('success', 'تم إضافة الطالب إلى الشعبة بنجاح');
     // }
 
-    public function destroy($classSectionId, $studentId)
+    public function destroy($classSectionId, $studentId , $academicYearId)
     {
         // تنفيذ soft delete يدويًا في الجدول الوسيط
         DB::table('student_class_section')
             ->where('class_section_id', $classSectionId)
             ->where('user_id', $studentId)
+            ->where('academic_year_id', $academicYearId)
             ->update(['deleted_at' => now()]);
 
         return redirect()->route('admin.class_sections.show', $classSectionId)

@@ -161,4 +161,6 @@ return [
     'select_students' => 'Select Students',
     'assigned_successfully' => 'Assigned successfully.',
     'no_materials_available' => 'No materials available for this grade.',
+    'create_quran_class' => 'Create Quran Class',
+    'quran_level' => 'Quran Level',
 ];

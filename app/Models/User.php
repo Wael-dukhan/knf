@@ -128,7 +128,8 @@ class User extends Authenticatable
     public function classSections()
     {
         return $this->belongsToMany(ClassSection::class, 'student_class_section', 'user_id', 'class_section_id')
-                    ->withTimestamps();
+                    ->withTimestamps()
+                    ->wherePivotNull('deleted_at');  // تتجاهل السجلات التي حُذفت soft delete
     }
 
     public function activeClassSections()
@@ -151,4 +152,13 @@ class User extends Authenticatable
         return $this->hasMany(MaterialUserTermSection::class);
     }
 
+    public function quranClasses()
+    {
+        return $this->belongsToMany(QuranClass::class, 'student_quran_classes')
+                    ->withTimestamps()
+                    ->withPivot(['status', 'joined_at', 'completed_at', 'deleted_at'])
+                    ->wherePivotNull('deleted_at');
+    }
+
+    
 }

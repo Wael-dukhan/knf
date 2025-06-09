@@ -39,7 +39,7 @@ class School extends Model
         return $this->hasMany(Term::class);
     }
 
-    public function academicYear()
+    public function academicYears()
     {
         return $this->hasMany(AcademicYear::class);
     }

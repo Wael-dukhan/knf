@@ -15,6 +15,8 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         $schedule->command('attendance:mark-default-present-for-students')->dailyAt('00:00');
         $schedule->command('attendance:mark-default-present-for-teachers')->dailyAt('01:00');
+        $schedule->command('attendance:mark-default-present-for-quran-teachers')->dailyAt('01:30');
+        $schedule->command('attendance:mark-default-present-for-quran-students')->dailyAt('02:00');
 
     }
 

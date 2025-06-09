@@ -64,7 +64,7 @@
                                     </td>
                                     <td>
                                         <a href="{{ route('admin.users.show', $student->id) }}" class="btn btn-warning btn-sm">{{ __('messages.view_student') }}</a>
-                                        <form action="{{ route('student.class_sections.delete',[$class_section->id , $student->id]) }}" method="POST" style="display:inline;">
+                                        <form action="{{ route('student.class_sections.delete',[$class_section->id , $student->student_id , $grade->academicYear->id ]) }}" method="POST" style="display:inline;">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{{ __('messages.are_you_sure') }}')">{{ __('messages.delete') }}</button>

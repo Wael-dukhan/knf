@@ -24,7 +24,10 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\StudentController;
-
+use App\Http\Controllers\QuranLevelController;
+use App\Http\Controllers\QuranClassesController;
+use App\Http\Controllers\QuranTeacherAttendanceController;
+use App\Http\Controllers\QuranStudentAttendanceController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -87,7 +90,7 @@ Route::get('/grades/{gradeId}/assign-student', [StudentClassSectionController::c
 // معالجة طلب تعيين الطالب إلى الشعبة
 Route::post('/grades/{gradeId}/assign-student', [StudentClassSectionController::class, 'assign'])->name('student.assign');
 
-Route::delete('/admin/class_sections/{classSectionId}/{studentId}', [StudentClassSectionController::class, 'destroy'])->name('student.class_sections.delete');
+Route::delete('/admin/class_sections/{classSectionId}/{studentId}/{academicYearId}', [StudentClassSectionController::class, 'destroy'])->name('student.class_sections.delete');
 
 // مسار عرض الطلاب وأولياء الأمور
 Route::prefix('students')->name('students.')->group(function () {
@@ -182,3 +185,44 @@ Route::post('/attendance/ajax-update', [StudentAttendanceRecordController::class
 
 Route::get('/teacher-attendance/{schoolId}/index', [TeacherAttendanceController::class, 'index'])->name('teacher-attendance.index');
 Route::post('/teacher-attendance/ajax-update', [TeacherAttendanceController::class, 'ajaxUpdate'])->name('teacher-attendance.ajaxUpdate');
+
+
+// Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:super_admin'])->group(function () {
+    Route::resource('quran-levels', QuranLevelController::class);
+    
+    // مسار مخصص لتقارير أو إجراءات أخرى
+    Route::get('quran-levels/report', [QuranLevelController::class, 'report'])->name('quran-levels.report');
+// });
+
+Route::resource('quran-classes', QuranClassesController::class);
+
+Route::get('/schools/{schoolId}/quran-levels', [App\Http\Controllers\QuranLevelController::class, 'getQuranLevelsBySchool'])
+    ->name('schools.quran-levels');
+use App\Http\Controllers\QuranClassController;
+
+Route::prefix('quran-classes')->group(function () {
+
+    // عرض نموذج اختيار الطلاب لتعيينهم لحلقة قرآنية (GET)
+    Route::get('{quranClass}/assign-students', [QuranClassesController::class, 'assignStudentsForm'])
+        ->name('quranClass.assign_students.form');
+
+    // استقبال الطلب وتعيين الطلاب للحلقة (POST)
+    Route::post('{quranClass}/assign-students', [QuranClassesController::class, 'assignStudents'])
+        ->name('quranClass.assign_students.store');
+
+});
+
+
+Route::prefix('quran-teacher-attendance')->middleware(['auth'])->group(function () {
+    
+    // صفحة عرض حضور معلمي حلقات القرآن حسب المدرسة (مع تمرير schoolId)
+    Route::get('/{schoolId}', [QuranTeacherAttendanceController::class, 'index'])
+        ->name('quran_teacher_attendance.index');
+
+    // تحديث الحضور عبر AJAX
+    Route::post('/ajax-update', [QuranTeacherAttendanceController::class, 'ajaxUpdate'])
+        ->name('quran_teacher_attendance.ajaxUpdate');
+});
+
+Route::get('quran-classes/{quranClass}/attendance', [QuranStudentAttendanceController::class, 'index'])->name('quran_student_attendance.index');
+Route::post('quran-classes/attendance/ajax-update', [QuranStudentAttendanceController::class, 'ajaxUpdate'])->name('quran_student_attendance.ajaxUpdate');

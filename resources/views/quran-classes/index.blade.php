@@ -1,20 +1,19 @@
 @extends('layouts.table-layout2')
 
-@section('title', __('messages.schools_list'))
+@section('title', __('messages.quran_classes_list'))
 
 @section('content')
-
     <div class="">
         <div class="">
             <!-- Page Header -->
             <div class="">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h3 class="page-title">{{ __('messages.schools_list') }}</h3>
+                        <h3 class="page-title">{{ __('messages.quran_classes_list') }}</h3>
                     </div>
                     <div class="col-auto text-end float-end ms-auto">
-                        <a href="{{ route('admin.schools.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> {{ __('messages.create_school') }}
+                        <a href="{{ route('quran-classes.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> {{ __('messages.quran_classes_list') }}
                         </a>
                     </div>
                 </div>
@@ -25,54 +24,48 @@
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
-            <!-- Schools Table -->
+            <!-- Quran Classes Table -->
             <div class="card card-table">
                 <div class="card-body">
-                    <table class="table table-bordered table-hover table-center mb-0" id="schoolsTable">
+                    <table class="table table-bordered table-hover table-center mb-0" id="quranClassesTable">
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>{{ __('messages.name') }}
-                                <th>{{ __('messages.location') }} 
-                                <th class="">{{ __('messages.actions') }}</th>
+                                <th>{{ __('messages.circle_name') }}</th>
+                                <th>{{ __('messages.quran_level') }}</th>
+                                <th>{{ __('messages.school') }}</th>
+                                <th>{{ __('messages.teacher') }}</th>
+                                <th>{{ __('messages.student_count') }}</th>
+                                <th>{{ __('messages.actions') }}</th>
                             </tr>
                             <tr>
-                                <th>
-                                    <input type="text" id="nameSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}"></th>
-                                </th>
-                                <th>
-                                    <input type="text" id="locationSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}"></th>
-                                </th>
-                                <th>
-                                    <input type="text" id="contactNumberSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}"></th>
-                                </th>
+                                <th></th>
+                                <th><input type="text" id="classNameSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}"></th>
+                                <th><input type="text" id="quranLevelSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}"></th>
+                                <th><input type="text" id="schoolSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}"></th>
+                                <th><input type="text" id="teacherSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}"></th>
+                                <th><input type="text" id="studentCountSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}"></th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($schools as $school)
+                            @foreach($quranClasses as $class)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $school->name }}</td>
-                                    <td>{{ $school->location }}</td>
+                                    <td>{{ $class->name }}</td>
+                                    <td>{{ $class->quranLevel->name ?? '-' }}</td>
+                                    <td>{{ $class->quranLevel->school->name ?? '-' }}</td>
+                                    <td>{{ $class->teacher->name ?? '-' }}</td>
+                                    <td>{{ $class->students_count ?? $class->students()->count() }}</td>
                                     <td class="text-end">
                                         <div class="actions">
-                                            <a href="{{ route('grade_levels.index', $school->id) }}" class="btn btn-sm bg-info-light me-2">
-                                                <i class="feather-eye"></i> {{ __('messages.view_grade_levels') }}
+                                            <a href="{{ route('quran-classes.show', $class->id) }}" class="btn btn-sm bg-info-light me-2">
+                                                <i class="feather-eye"></i> {{ __('messages.view') }}
                                             </a>
-                                            <a href="{{ route('teacher-attendance.index', $school->id) }}" class="btn btn-sm bg-primary me-2">
-                                                <i class="feather-eye"></i> {{ __('messages.teacher_attendance_log') }}
-                                            </a>
-                                            <a href="{{ route('schools.quran-levels', $school->id) }}" class="btn btn-sm bg-primary-light me-2">
-                                                <i class="feather-eye"></i> {{ __('messages.view_quran_levels') }}
-                                            </a>
-                                            <a href="{{ route('quran_teacher_attendance.index', $school->id) }}" class="btn btn-sm bg-primary me-2">
-                                                <i class="feather-eye"></i> {{ __('messages.quran_teacher_attendance_log') }}
-                                            </a>
-                                            <a href="{{ route('admin.schools.edit', $school->id) }}" class="btn btn-sm bg-warning-light me-2">
+                                            <a href="{{ route('quran-classes.edit', $class->id) }}" class="btn btn-sm bg-warning-light me-2">
                                                 <i class="feather-edit"></i> {{ __('messages.edit') }}
                                             </a>
-                                            <form action="{{ route('admin.schools.destroy', $school->id) }}" method="POST" style="display:inline;">
+                                            <form action="{{ route('quran-classes.destroy', $class->id) }}" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm bg-danger-light" onclick="return confirm('{{ __('messages.confirm_delete') }}')">
@@ -94,7 +87,7 @@
 @push('scripts')
     <script>
         $(document).ready(function () {
-            let table = $('#schoolsTable').DataTable({
+            let table = $('#quranClassesTable').DataTable({
                 dom: 'Bfrtip',
                 orderCellsTop: true,
                 fixedHeader: true,
@@ -103,18 +96,14 @@
                     {
                         extend: 'excelHtml5',
                         text: '{{ __("messages.export_excel") }}',
-                        exportOptions: {
-                            columns: ':visible:not(:last-child)'
-                        }
+                        exportOptions: { columns: ':visible:not(:last-child)' }
                     },
                     {
                         extend: 'pdfHtml5',
                         text: '{{ __("messages.export_pdf") }}',
                         orientation: 'landscape',
                         pageSize: 'A4',
-                        exportOptions: {
-                            columns: ':visible:not(:last-child)'
-                        },
+                        exportOptions: { columns: ':visible:not(:last-child)' },
                         customize: function (doc) {
                             doc.defaultStyle.alignment = 'right';
                             doc.styles.tableHeader.alignment = 'center';
@@ -145,17 +134,21 @@
                 }
             });
 
-            // فلترة الأعمدة
-            $('#nameSearch').on('keyup', function () {
+            // فلترة الأعمدة بنصوص البحث
+            $('#classNameSearch').on('keyup', function () {
                 table.column(1).search(this.value).draw();
             });
-
-            $('#locationSearch').on('keyup', function () {
+            $('#quranLevelSearch').on('keyup', function () {
                 table.column(2).search(this.value).draw();
             });
-
-            $('#contactNumberSearch').on('keyup', function () {
+            $('#schoolSearch').on('keyup', function () {
                 table.column(3).search(this.value).draw();
+            });
+            $('#teacherSearch').on('keyup', function () {
+                table.column(4).search(this.value).draw();
+            });
+            $('#studentCountSearch').on('keyup', function () {
+                table.column(5).search(this.value).draw();
             });
         });
     </script>

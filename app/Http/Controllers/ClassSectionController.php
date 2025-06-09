@@ -96,6 +96,7 @@ class ClassSectionController extends Controller
             ->join('users', 'student_class_section.user_id', '=', 'users.id')
             ->join('class_sections', 'student_class_section.class_section_id', '=', 'class_sections.id')
             ->where('student_class_section.class_section_id', $class_section->id) // الشعبة المختارة
+            ->whereNull('student_class_section.deleted_at') // تجاهل السجلات المحذوفة ناعماً
             ->select(
                 'student_class_section.*',
                 'users.id as student_id',
