@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->foreignId('school_id')->constrained()->onDelete('cascade');
+            $table->date('start_date'); // تاريخ بداية السنة الدراسية
+            $table->date('end_date'); // تاريخ نهاية السنة الدراسية
             $table->timestamps();
         });
     }

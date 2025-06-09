@@ -32,11 +32,15 @@ class AcademicYearController extends Controller
                 }),
             ],
             'school_id' => 'required|exists:schools,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
     
         AcademicYear::create([
             'name' => $request->name,
             'school_id' => $request->school_id,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
         ]);
     
         return redirect()->route('admin.academic_years.index')->with('success', 'تمت إضافة السنة الدراسية بنجاح');
@@ -54,9 +58,11 @@ class AcademicYearController extends Controller
         $request->validate([
             'name' => 'required|max:20|unique:academic_years,name,' . $academic_year->id,
             'school_id' => 'required|exists:schools,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
     
-        $academic_year->update($request->only(['name', 'school_id']));
+        $academic_year->update($request->only(['name', 'school_id', 'start_date', 'end_date']));
     
         return redirect()->route('admin.academic_years.index')->with('success', 'تم التحديث بنجاح');
     }

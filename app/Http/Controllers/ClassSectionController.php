@@ -28,12 +28,13 @@ class ClassSectionController extends Controller
     
     public function store(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             // 'name' => 'required|string|max:125',
             'name' => [
                 'required',
                 Rule::unique('grades')->where(function ($query) use ($request) {
-                    return $query->where('grade_id', $request->grade_id)
+                    return $query->where('id', $request->grade_id)
                                 ->whereNull('deleted_at'); // تجاهل السجلات المحذوفة ناعماً
                 }),
             ],
@@ -46,7 +47,7 @@ class ClassSectionController extends Controller
     
         ClassSection::create($request->only(['name', 'grade_id', 'school_id']));
     
-        return redirect()->route('admin.class_sections.index')->with('success', 'تمت إضافة الشعبة بنجاح');
+        return redirect()->route('admin.grades.show',$request->grade_id)->with('success', 'تمت إضافة الشعبة بنجاح');
     }
     
 
@@ -106,7 +107,6 @@ class ClassSectionController extends Controller
             )
             ->get();
 
-        // dd($class_section);
         $grade = $class_section->grade;
     
         return view('class_sections.show', compact('class_section', 'students','grade'));

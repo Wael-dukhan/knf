@@ -10,12 +10,14 @@ use Illuminate\Http\Request;
 class StudentParentController extends Controller
 {
     // عرض جميع الطلاب
-    public function index()
-    {
-        $students = User::role('student')->get(); // استرجاع الطلاب
-        // dd($students);
-        return view('students.parents.index', compact('students'));
-    }
+public function index()
+{
+    $students = User::role('student')
+        ->with(['parents', 'school']) // جلب المدرسة وأولياء الأمور معًا
+        ->get();
+
+    return view('students.parents.index', compact('students'));
+}
 
     // عرض نموذج إضافة أولياء الأمور للطلاب
     public function create()

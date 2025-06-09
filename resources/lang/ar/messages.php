@@ -266,5 +266,15 @@ return [
     'attendance_for_quran_students' => 'تسجيل حضور طلاب الحلقات',
     'quran_class' => 'حلقة القرآن',
     'student_attendance_log' => 'سجل حضور الطالب',
+    'choose_quran_level' => 'اختر المستوى القرآني',
+    'class_name' => 'اسم الحلقة',
+    'create' => 'إنشاء',
+    'search_school' => 'البحث عن مدرسة',
+    'create_academic_year' => 'إنشاء سنة دراسية جديدة',
+    'academic_year_name_required' => 'اسم السنة الدراسية مطلوب.',
+    'academic_year_name_unique' => 'اسم السنة الدراسية يجب أن يكون فريدًا.',
+    'no_academic_years_found' => 'لا توجد سنوات دراسية متاحة.',
+    'edit_academic_year' => 'تعديل السنة الدراسية',
+    'education_history' => 'السجل التعليمي',
 
 ];

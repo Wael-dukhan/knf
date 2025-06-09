@@ -16,11 +16,13 @@
             <tr>
                 <th>{{ __('messages.student_name') }}</th>
                 <th>{{ __('messages.assigned_parents') }}</th>
+                <th>{{ __('messages.school') }}</th>
                 <th>{{ __('messages.actions') }}</th>
             </tr>
             <tr>
                 <th><input type="text" id="studentSearch" placeholder="{{ __('messages.search_student') }}" class="form-control form-control-sm" /></th>
                 <th><input type="text" id="parentSearch" placeholder="{{ __('messages.search_parent') }}" class="form-control form-control-sm" /></th>
+                <th><input type="text" id="schoolSearch" placeholder="{{ __('messages.search_school') }}" class="form-control form-control-sm" /></th>
                 <th></th>
             </tr>
         </thead>
@@ -37,6 +39,7 @@
                             <span class="text-muted">{{ __('messages.no_parents_assigned') }}</span>
                         @endif
                     </td>
+                    <td>{{ $student->school->name ?? __('messages.no_school') }}</td>
                     <td>
                         @foreach($student->parents as $parent)
                             <a href="{{ route('students.parents.edit', ['student' => $student->id, 'parent' => $parent->id]) }}" class="btn btn-warning btn-sm mb-1">
@@ -97,7 +100,9 @@
         $('#studentSearch').on('keyup change', function () {
             table.column(0).search(this.value, true, false).draw();
         });
-
+        $('#schoolSearch').on('keyup change', function () {
+            table.column(2).search(this.value, true, false).draw();
+        });
         // البحث الجزئي لاسم ولي الأمر
         $('#parentSearch').on('keyup change', function () {
             table.column(1).search(this.value, true, false).draw();

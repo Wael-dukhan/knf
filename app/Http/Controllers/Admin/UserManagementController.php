@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\DB;
 
 class UserManagementController extends Controller
 {
@@ -45,11 +46,50 @@ class UserManagementController extends Controller
         return redirect()->route('admin.users.create')->with('success', 'تم إنشاء المستخدم وتعيين الدور بنجاح.');
     }
 
+    // public function show($id)
+    // {
+    //     $user = User::findOrFail($id);
+    //     return view('admin.users.show', compact('user'));
+    // }
+
     public function show($id)
     {
-        $user = User::findOrFail($id);
-        return view('admin.users.show', compact('user'));
+        $user = User::with(['school', 'parents'])->findOrFail($id);
+
+        $educationHistoryArray = DB::select("
+            SELECT 
+                academic_years.name AS year_name,
+                grades.name AS grade_name,
+                class_sections.name AS section_name, -- مباشرة من الجدول
+                class_sections.id AS class_section_id, -- مباشرة من الجدول
+                student_class_section.status,
+                schools.name AS school_name
+            FROM student_class_section
+            INNER JOIN class_sections ON student_class_section.class_section_id = class_sections.id
+            INNER JOIN grades ON class_sections.grade_id = grades.id
+            INNER JOIN academic_years ON student_class_section.academic_year_id = academic_years.id
+            INNER JOIN schools ON grades.school_id = schools.id
+            WHERE student_class_section.user_id = ?
+            AND student_class_section.deleted_at IS NULL
+            ORDER BY academic_years.start_date ASC
+        ", [$id]);
+
+        $educationHistory = collect($educationHistoryArray);
+        $user = auth()->user();
+        $roles = $user->getRoleNames();  // Collection of role names
+        $firstRole = $roles->first();    // أول دور
+        // dd($firstRole);
+
+          // جلب أولياء الأمور للطالب (يمكن أن يكون أكثر من واحد)
+        $parents = DB::table('parent_student')
+            ->join('users as parents', 'parent_student.parent_id', '=', 'parents.id')
+            ->where('parent_student.student_id', $id)
+            ->select('parents.id', 'parents.name', 'parents.email')
+            ->get();
+        // dd($parents);    
+        return view('admin.users.show', compact('user', 'educationHistory','firstRole' , 'parents'));
     }
+
 
     public function edit($id)
     {

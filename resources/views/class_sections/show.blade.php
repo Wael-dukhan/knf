@@ -63,7 +63,7 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.users.show', $student->id) }}" class="btn btn-warning btn-sm">{{ __('messages.view_student') }}</a>
+                                        <a href="{{ route('admin.users.show', $student->student_id) }}" class="btn btn-warning btn-sm">{{ __('messages.view_student') }}</a>
                                         <form action="{{ route('student.class_sections.delete',[$class_section->id , $student->student_id , $grade->academicYear->id ]) }}" method="POST" style="display:inline;">
                                             @csrf
                                             @method('DELETE')

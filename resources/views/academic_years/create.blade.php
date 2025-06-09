@@ -1,13 +1,13 @@
 @extends('layouts.app2')
 
-@section('title', __('messages.academic_years_list'))
+@section('title', __('messages.create_academic_year'))
 
 @section('content')
 <div class="page-wrapper">
     <div class="container mt-5">
 
         <div class="card shadow-sm p-4">
-            <h4 class="mb-4">{{ __('messages.academic_years_list') }}</h4>
+            <h4 class="mb-4">{{ __('messages.create_academic_year') }}</h4>
 
             @if ($errors->any())
                 <div class="alert alert-danger">
@@ -41,6 +41,22 @@
                             </option>
                         @endforeach
                     </select>
+                </div>
+
+                <!-- إضافة حقل تاريخ البدء -->
+                <div class="mb-3">
+                    <label for="start_date" class="form-label">
+                        {{ __('messages.start_date') }} <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" name="start_date" id="start_date" value="{{ old('start_date') }}" class="form-control" required>
+                </div>
+
+                <!-- إضافة حقل تاريخ النهاية -->
+                <div class="mb-3">
+                    <label for="end_date" class="form-label">
+                        {{ __('messages.end_date') }} <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" name="end_date" id="end_date" value="{{ old('end_date') }}" class="form-control" required>
                 </div>
 
                 <div class="d-flex justify-content-between">

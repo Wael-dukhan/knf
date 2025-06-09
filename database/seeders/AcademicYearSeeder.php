@@ -15,11 +15,15 @@ class AcademicYearSeeder extends Seeder
         AcademicYear::create([
             'name' => '2023/2024',
             'school_id' => $school->id,
+            'start_date' => '2023-09-01',
+            'end_date' => '2024-06-30',
         ]);
 
         AcademicYear::create([
             'name' => '2024/2025',
             'school_id' => $school->id,
+            'start_date' => '2024-09-01',
+            'end_date' => '2025-06-30',
         ]);
     }
 }
