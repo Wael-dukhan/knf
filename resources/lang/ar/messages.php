@@ -276,5 +276,8 @@ return [
     'no_academic_years_found' => 'لا توجد سنوات دراسية متاحة.',
     'edit_academic_year' => 'تعديل السنة الدراسية',
     'education_history' => 'السجل التعليمي',
-
+    'choose_academic_year' => 'اختر السنة الدراسية',
+    'not_defined' => 'غير محدد',
+    'quran_teacher' => 'معلم القرآن',
+    'quran_supervisor' => 'مشرف حلقات القرآن',
 ];

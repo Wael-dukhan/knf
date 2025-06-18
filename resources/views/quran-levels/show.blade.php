@@ -92,9 +92,15 @@
         </div>
 
         <div class="d-flex justify-content-between">
-            <a href="{{ route('schools.quran-levels',$quranLevel->school->id) }}" class="btn btn-secondary">
-                <i class="feather-arrow-left"></i> {{ __('quran_levels.back') }}
-            </a>
+            @if (auth()->user()->getRoleNames()[0] == 'super_admin')
+                <a href="{{ route('schools.quran-levels',$quranLevel->school->id) }}" class="btn btn-secondary">
+                    <i class="feather-arrow-left"></i> {{ __('quran_levels.back') }}
+                </a>
+            @else
+                <a href="{{ route('quran-levels.index') }}" class="btn btn-secondary">
+                    <i class="feather-arrow-left"></i> {{ __('quran_levels.back') }}
+                </a>
+            @endif
         </div>
     </div>
 </div>

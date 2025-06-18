@@ -5,9 +5,10 @@
     <div class="container mt-5">
        <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">{{ __('messages.user_details') }}</h2>
-        <a href="{{ route('admin.class_sections.show',$educationHistory->last()->class_section_id) }}" class="btn btn-secondary">
+        <a href="#" onclick="history.back(); return false;" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> {{ __('messages.back') }}
         </a>
+
     </div>
 
     <div class="card shadow-sm rounded-3 mb-4">

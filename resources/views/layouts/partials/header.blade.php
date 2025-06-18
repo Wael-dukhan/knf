@@ -116,7 +116,7 @@
                     />
                     <div class="user-text">
                         <h6>{{ Auth::user()->name }}</h6>
-                        <p class="text-muted mb-0">Administrator</p>
+                        <p class="text-muted mb-0">{{__('messages.'.Auth::user()->getRoleNames()->first())}}</p>
                     </div>
                 </span>
             </a>
@@ -131,7 +131,7 @@
                     </div>
                     <div class="user-text">
                         <h6>{{ Auth::user()->name }}</h6>
-                        <p class="text-muted mb-0">Administrator</p>
+                        <p class="text-muted mb-0">{{__('messages.'.Auth::user()->getRoleNames()->first())}}</p>
                     </div>
                 </div>
                 <a class="dropdown-item" href="{{ route('profile.edit') }}">My Profile</a>

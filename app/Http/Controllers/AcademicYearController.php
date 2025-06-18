@@ -4,19 +4,46 @@ namespace App\Http\Controllers;
 use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class AcademicYearController extends Controller
 {
     public function index()
     {
-        $academicYears = AcademicYear::with('school')->orderByDesc('id')->get();
-        // dd($academicYears);
+        $user = Auth::user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع السنوات الدراسية
+            $academicYears = AcademicYear::with('school')->orderByDesc('id')->get();
+            // dd($academicYears);
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض السنوات الدراسية الخاصة بالمدرسة التي يديرها
+            $academicYears = AcademicYear::where('school_id', $user->school_id)->with('school')->orderByDesc('id')->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+
         return view('academic_years.index', compact('academicYears'));
     }
 
     public function create()
     {
-        $schools = \App\Models\School::all();
+        $user = Auth::user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع السنوات الدراسية
+            $schools = \App\Models\School::all();
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض السنوات الدراسية الخاصة بالمدرسة التي يديرها
+            $schools = \App\Models\School::where('id', $user->school_id)->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+
         return view('academic_years.create', compact('schools'));
     }
     
@@ -48,7 +75,19 @@ class AcademicYearController extends Controller
     
     public function edit(AcademicYear $academic_year)
     {
-        $schools = \App\Models\School::all(); // جلب جميع المدارس
+        $user = Auth::user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع السنوات الدراسية
+            $schools = \App\Models\School::all();
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض السنوات الدراسية الخاصة بالمدرسة التي يديرها
+            $schools = \App\Models\School::where('id', $user->school_id)->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
         return view('academic_years.edit', compact('academic_year', 'schools'));
     }
     

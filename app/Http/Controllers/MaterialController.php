@@ -15,15 +15,51 @@ class MaterialController extends Controller
 
      public function index()
      {
-         $materials = Material::all();
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع المواد
+        if ($role === 'super_admin') {
+            $materials = Material::with('grade')->get();
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض المواد الخاصة بالمدرسة التي يديرها
+            $materials = Material::with('grade')->whereHas('grade', function ($query) use ($user) {
+                $query->where('school_id', $user->school_id);
+            })->get();
+        } else if ($role === 'teacher' || $role === 'quran_teacher') {
+            // في حالة المعلم أو معلم القرآن، يمكن عرض المواد التي يدرسها
+            $materials = Material::with('grade')->whereHas('grade.teachers', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->get();
+        } else if ($role === 'student' || $role === 'parent') {
+            // في حالة الطالب أو ولي الأمر، يمكن عرض المواد الخاصة بالصف الذي ينتمي إليه الطالب
+            $materials = Material::with('grade')->whereHas('grade.students', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->get();
+        }
+        //  $materials = Material::all();
          return view('materials.index', compact('materials'));
      }
      
      public function create()
      {
-        $grades = Grade::all(); // في دالة create()
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع الصفوف
+        if ($role === 'super_admin') {
+            $grades = Grade::all();
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض الصفوف الخاصة بالمدرسة التي يديرها
+            $grades = Grade::where('school_id', $user->school_id)->get();
+        } else {
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+        // $grades = Grade::all(); // في دالة create()
         // $teachers = User::role('teacher')->get(); // يجلب كل المستخدمين الذين لديهم دور "teacher"
-
+        
          return view('materials.create', compact('grades'));
      }
      

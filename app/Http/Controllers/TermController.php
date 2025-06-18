@@ -6,21 +6,61 @@ use App\Models\AcademicYear;
 use App\Models\School;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Facades\Auth;
 
 class TermController extends Controller
 {
     public function index()
     {
-        $terms = Term::with('academicYear', 'school')->get();
+        // التحقق من صلاحية المستخدم
+        $user = Auth::user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // الحصول على جميع الفصول الدراسية مع السنة الدراسية والمدرسة
+        // في حالة المشرف العام، يمكن عرض جميع الفصول الدراسية
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع الفصول الدراسية
+            $terms = Term::with('academicYear', 'school')->get();
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض الفصول الدراسية الخاصة بالمدرسة التي يديرها
+            $terms = Term::with('academicYear', 'school')
+                ->where('school_id', $user->school_id)
+                ->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
         // dd($terms);
         return view('admin.terms.index', compact('terms'));
     }
 
     public function create()
     {
-        $academicYears = AcademicYear::all();
-        $schools = School::withoutTrashed()->get();
+        // الحصول على قائمة السنوات الدراسية والمدارس
+        $user = Auth::user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع السنوات الدراسية
+            $academicYears = AcademicYear::all();
+            $schools = School::withoutTrashed()->get();
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض السنوات الدراسية الخاصة بالمدرسة التي يديرها
+            $academicYears = AcademicYear::where('school_id', $user->school_id)->get();
+            $schools = School::where('id', $user->school_id)->withoutTrashed()->get();
+            // dd($academicYears);
+        } else if ($role === 'teacher' || $role === 'quran_teacher') {
+            // في حالة المعلم أو معلم القرآن، يمكن عرض المدارس التي يعملون بها
+            $academicYears = AcademicYear::whereHas('schools', function ($query) use ($user) {
+                $query->where('id', $user->school_id);
+            })->get();
+            $schools = School::whereHas('teachers', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->withoutTrashed()->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
         return view('admin.terms.create', compact('academicYears', 'schools'));
     }
 
@@ -61,6 +101,13 @@ class TermController extends Controller
 
     public function edit($id)
     {
+        // التحقق من صلاحية المستخدم
+        $user = Auth::user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        if ($role !== 'super_admin' && $role !== 'school_manager') {
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
         // العثور على الفصل الدراسي
         $term = Term::findOrFail($id);
 

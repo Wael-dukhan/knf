@@ -12,14 +12,46 @@ class QuranLevelController extends Controller
 {
     public function index()
     {
-        $quranLevels = QuranLevel::with(['school', 'academicYear'])->get();
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع مستويات القرآن
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع مستويات القرآن
+            $quranLevels = QuranLevel::with(['school', 'academicYear'])->get();
+        } else if ($role === 'quran_supervisor') {
+            // في حالة مدير المدرسة، يمكن عرض مستويات القرآن الخاصة بالمدرسة التي يديرها
+            $quranLevels = QuranLevel::where('school_id', $user->school_id)
+                ->with(['school', 'academicYear'])
+                ->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
         return view('quran-levels.index', compact('quranLevels'));
     }
 
     public function create()
     {
-        $schools = School::all();
-        $academicYears = AcademicYear::all();
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم  
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع المدارس والسنة الدراسية
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع المدارس والسنة الدراسية
+            $schools = School::all();
+            $academicYears = AcademicYear::all();
+        } else if ($role === 'quran_supervisor') {
+            // في حالة مشرف القرآن، يمكن عرض المدارس الخاصة بالمدرسة التي يديرها
+            $schools = School::where('id', $user->school_id)->get();
+            $academicYears = AcademicYear::where('school_id', $user->school_id)->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+
         return view('quran-levels.create', compact('schools', 'academicYears'));
     }
 
@@ -58,8 +90,24 @@ class QuranLevelController extends Controller
 
     public function edit(QuranLevel $quranLevel)
     {
-        $schools = School::all();
-        $academicYears = AcademicYear::all();
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم  
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع المدارس والسنة الدراسية
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع المدارس والسنة الدراسية
+            $schools = School::all();
+            $academicYears = AcademicYear::all();
+        } else if ($role === 'quran_supervisor') {
+            // في حالة مشرف القرآن، يمكن عرض المدارس الخاصة بالمدرسة التي يديرها
+            $schools = School::where('id', $user->school_id)->get();
+            $academicYears = AcademicYear::where('school_id', $user->school_id)->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+
         return view('quran-levels.edit', compact('quranLevel', 'schools', 'academicYears'));
     }
 
@@ -103,14 +151,37 @@ class QuranLevelController extends Controller
 
     public function show(QuranLevel $quranLevel)
     {
-        $quranLevel->load(['quranClasses.quranTeacher', 'academicYear']);
-        // dd($quranLevel);
-        // حساب عدد الطلاب في كل حلقة داخل هذا المستوى
-        foreach ($quranLevel->quranClasses as $class) {
-            $class->loadCount(['students as student_count']);
-        }
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع مستويات القرآن
+        if ($role === 'super_admin') {
+            $quranLevel->load(['quranClasses.quranTeacher', 'academicYear']);
+            // dd($quranLevel);
+            // حساب عدد الطلاب في كل حلقة داخل هذا المستوى
+            foreach ($quranLevel->quranClasses as $class) {
+                $class->loadCount(['students as student_count']);
+            }
 
-        $totalStudents = $quranLevel->quranClasses->sum('student_count');
+            $totalStudents = $quranLevel->quranClasses->sum('student_count');
+        } else if ($role === 'quran_supervisor') {
+            // في حالة مشرف القرآن، يمكن عرض مستويات القرآن الخاصة بالمدرسة التي يديرها
+            if ($quranLevel->school_id !== $user->school_id) {
+                return redirect()->route('quran-levels.index')->with('error', 'ليس لديك صلاحية الوصول إلى هذا المستوى.');
+            }
+            $quranLevel->load(['quranClasses.quranTeacher', 'academicYear']);
+            // حساب عدد الطلاب في كل حلقة داخل هذا المستوى
+            foreach ($quranLevel->quranClasses as $class) {
+                $class->loadCount(['students as student_count']);
+            }
+
+            $totalStudents = $quranLevel->quranClasses->sum('student_count');
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+        
 
         return view('quran-levels.show', compact('quranLevel', 'totalStudents'));
     }

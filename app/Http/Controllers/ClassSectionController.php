@@ -21,8 +21,24 @@ class ClassSectionController extends Controller
 
     public function create()
     {
-        $grades = Grade::all();
-        $schools = School::all(); // إذا كنت تريد تحديد المدرسة أيضًا
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع الصفوف
+        if ($role === 'super_admin') {
+            $grades = Grade::all();
+            $schools = School::all(); // إذا كنت تريد تحديد المدرسة أيضًا
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض الصفوف الخاصة بالمدرسة التي يديرها
+            $grades = Grade::where('school_id', $user->school_id)->get();
+            $schools = School::where('id', $user->school_id)->get();
+        } else {
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+        // dd($grades);
+        // $grades = Grade::all();
+        // $schools = School::all(); // إذا كنت تريد تحديد المدرسة أيضًا
         return view('class_sections.create', compact('grades', 'schools'));
     }
     

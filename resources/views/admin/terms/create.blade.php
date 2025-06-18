@@ -79,7 +79,7 @@
         const schoolSelect = document.getElementById('school_id');
         const academicYearSelect = document.getElementById('academic_year_id');
         const selectYearText = @json(__('messages.select_academic_year'));
-
+        console.log(selectYearText);
         schoolSelect.addEventListener('change', function () {
             let schoolId = this.value;
 

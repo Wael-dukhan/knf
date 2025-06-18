@@ -16,9 +16,30 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('school')->get();
-        $schools = School::all(); // للحصول على كل المدارس
-        $roles = Role::all();
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع المستخدمين
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع المستخدمين
+            $users = User::with('school')->get();
+            $schools = School::all(); // للحصول على كل المدارس
+            $roles = Role::all();
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض المستخدمين الخاصين بالمدرسة التي يديرها
+            $users = User::with('school')
+                ->where('school_id', $user->school_id)
+                ->get();
+            $schools = School::where('id', $user->school_id)->get();
+            $roles = Role::all()->skip(1); // تخطي دور "admin"
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+        // $users = User::with('school')->get();
+        // $schools = School::all(); // للحصول على كل المدارس
+        // $roles = Role::all();
     
         return view('users.index', compact('users', 'schools','roles'));
     }
@@ -26,8 +47,25 @@ class UserController extends Controller
 
     public function create()
     {
-        $roles = Role::all()->skip(1); // تخطي دور "admin"
-        $schools = School::all(); // جلب جميع المدارس
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع الأدوار والمدارس
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع الأدوار والمدارس
+            $roles = Role::all()->skip(1); // تخطي دور "admin"
+            $schools = School::all();
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض الأدوار الخاصة بالمدرسة التي يديرها
+            $roles = Role::whereNotIn('name', ['super_admin', 'school_manager'])->get();
+            $schools = School::where('id', $user->school_id)->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+        // $roles = Role::all()->skip(1); // تخطي دور "admin"
+        // $schools = School::all(); // جلب جميع المدارس
         $parents = User::role('parent')->get(); // استرجاع الطلاب
         return view('users.create', compact('roles', 'schools', 'parents'));
     }
@@ -96,8 +134,26 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        $roles = Role::all()->skip(1); // تخطي دور "admin"
-        $schools = School::all(); // جلب جميع المدارس
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع الأدوار والمدارس
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع الأدوار والمدارس
+            $roles = Role::all()->skip(1); // تخطي دور "admin"
+            $schools = School::all();
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض الأدوار الخاصة بالمدرسة التي يديرها
+            $roles = Role::whereNotIn('name', ['super_admin', 'school_manager'])->get();
+            $schools = School::where('id', $user->school_id)->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+
+        // $roles = Role::all()->skip(1); // تخطي دور "admin"
+        // $schools = School::all(); // جلب جميع المدارس
         $parents = User::role('parent')->get(); // استرجاع الطلاب
         // dd($user);
         // // إذا كان المستخدم هو مدير، تأكد من أن هناك مديرًا في نفس المدرسة

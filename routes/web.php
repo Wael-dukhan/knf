@@ -72,7 +72,7 @@ Route::middleware('guest')->group(function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
-Route::resource('materials', MaterialController::class);
+Route::resource('materials', MaterialController::class)->middleware(['auth','role:super_admin|school_manager|teacher']);
 
 Route::get('/material-assignments', [MaterialTeacherAssignmentController::class, 'index'])->name('material-assignments.index');
 Route::get('/class-sections/{id}/material-assignments', [MaterialTeacherAssignmentController::class, 'show'])->name('material-assignments.show');
@@ -111,13 +111,11 @@ Route::prefix('students')->name('students.')->group(function () {
 
     // حذف أولياء الأمور
     Route::delete('{student}/parents/{parent}', [StudentParentController::class, 'destroy'])->name('parents.destroy');
-});
+})->middleware(['auth','role:super_admin|school_manager']);
 
-Route::resource('users', UserController::class);
+Route::resource('users', UserController::class)->middleware(['auth', 'role:super_admin|school_manager']);
 
-
-
-Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:super_admin|school_manager|quran_supervisor'])->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserManagementController::class, 'create'])->name('users.create');
@@ -137,7 +135,7 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')
 
     Route::resource('class_sections', ClassSectionController::class);
 
-    Route::resource('activities', ActivityController::class)->names('activities');
+    Route::get('class_sections/grades-by-school/{school_id}', [GradeController::class, 'getGradesBySchool'])->name('grades.by_school');
 
 });
 

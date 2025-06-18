@@ -21,9 +21,22 @@ class GradeController extends Controller
 
     public function create()
     {
-        $schools = School::all();
-        $academicYears = AcademicYear::all();
-
+        // $schools = School::all();
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع المدارس
+            $academicYears = AcademicYear::all();
+            $schools = School::all();
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض المدارس الخاصة بالمدرسة التي يديرها
+            $schools = School::where('id', $user->school_id)->get();
+            $academicYears = AcademicYear::where('school_id', $user->school_id)->get();
+        } else {
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
         // المراحل الدراسية الثلاث
         $gradeLevels  = Grade::GRADE_LEVELS;
 
@@ -56,7 +69,20 @@ class GradeController extends Controller
 
     public function edit(Grade $grade)
     {
-        $academicYears = AcademicYear::all();
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع المدارس
+            $academicYears = AcademicYear::all();
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض المدارس الخاصة بالمدرسة التي يديرها
+            $academicYears = AcademicYear::where('school_id', $user->school_id)->get();
+        } else {
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+        // $academicYears = AcademicYear::all();
         return view('grades.edit', compact('grade', 'academicYears'));
     }
 
@@ -95,6 +121,14 @@ class GradeController extends Controller
     
         return view('grades.show', compact('grade', 'totalStudents'));
     }
+
+    public function getGradesBySchool($school_id)
+    {
+        $grades = Grade::where('school_id', $school_id)->get();
+
+        return response()->json($grades);
+    }
+
     
     
 }

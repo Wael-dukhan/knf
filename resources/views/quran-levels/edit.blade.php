@@ -125,7 +125,7 @@
                 <a href="{{ route('quran-levels.index') }}" class="btn btn-secondary">
                     <i class="feather-arrow-left"></i> {{ __('quran_levels.back') }}
                 </a>
-                <button type="submit" class="btn btn-success">{{ __('quran_levels.update') }}</button>
+                <button type="submit" class="btn btn-success">{{ __('messages.update') }}</button>
             </div>
         </form>
     </div>

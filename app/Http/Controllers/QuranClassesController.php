@@ -13,9 +13,27 @@ class QuranClassesController extends Controller
     // عرض جميع الحلقات
     public function index()
     {
-        $quranClasses = QuranClass::with(['quranLevel.school', 'quranTeacher', 'students'])->get();
-        $schools = School::all();
-        $teachers = User::role('quran_teacher')->get();
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع الحلقات
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع الحلقات
+            $quranClasses = QuranClass::with(['quranLevel.school', 'quranTeacher', 'students'])->get();
+            $schools = School::all();
+            $teachers = User::role('quran_teacher')->get();
+        } else if ($role === 'quran_supervisor') {
+            // في حالة مشرف القرآن، يمكن عرض الحلقات الخاصة بالمدرسة التي يديرها
+            $quranClasses = QuranClass::whereHas('quranLevel.school', function($query) use ($user) {
+                $query->where('id', $user->school_id);
+            })->with(['quranLevel.school', 'quranTeacher', 'students'])->get();
+            $schools = School::where('id', $user->school_id)->get();
+            $teachers = User::role('quran_teacher')->where('school_id', $user->school_id)->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
 
         return view('quran-classes.index', compact('quranClasses', 'schools', 'teachers'));
     }
@@ -24,8 +42,26 @@ class QuranClassesController extends Controller
     // صفحة إنشاء حلقة جديدة
     public function create()
     {
-        $quranLevels = QuranLevel::all();
-        $teachers = User::role('quran_teacher')->get();
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع مستويات القرآن
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض جميع مستويات القرآن
+            $quranLevels = QuranLevel::all();
+            $teachers = User::role('quran_teacher')->get();
+        } else if ($role === 'quran_supervisor') {
+            // في حالة مشرف القرآن، يمكن عرض مستويات القرآن الخاصة بالمدرسة التي يديرها
+            $quranLevels = QuranLevel::whereHas('school', function($query) use ($user) {
+                $query->where('id', $user->school_id);
+            })->get();
+            $teachers = User::role('quran_teacher')->where('school_id', $user->school_id)->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+
         return view('quran-classes.create', compact('quranLevels', 'teachers'));
     }
 
@@ -49,7 +85,23 @@ class QuranClassesController extends Controller
     // عرض تفاصيل حلقة معينة
     public function show(QuranClass $quranClass)
     {   
-        $quranClass->load('quranTeacher', 'students', 'quranLevel');
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض تفاصيل الحلقة
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض تفاصيل الحلقة
+            $quranClass->load('quranTeacher', 'students', 'quranLevel');
+        } else if ($role === 'quran_supervisor') {
+            // في حالة مشرف القرآن، يمكن عرض تفاصيل الحلقة الخاصة بالمدرسة التي يديرها
+            if ($quranClass->quranLevel->school_id !== $user->school_id) {
+                return redirect()->route('quran-classes.index')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الحلقة.');
+            }
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
         // dd($quranClass);
         return view('quran-classes.show', compact('quranClass'));
     }
@@ -57,9 +109,29 @@ class QuranClassesController extends Controller
     // صفحة تعديل حلقة
     public function edit(QuranClass $quranClass)
     {
-        $quranLevel = QuranLevel::where('school_id', $quranClass->quranLevel->school_id)
-                                ->get();
-        $teachers = User::role('quran_teacher')->where('school_id' , $quranClass->quranLevel->school_id)->get();
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض تفاصيل الحلقة
+        if ($role === 'super_admin') {
+            // في حالة المشرف العام، يمكن عرض تفاصيل الحلقة
+            $quranLevel = QuranLevel::where('school_id', $quranClass->quranLevel->school_id)
+                                    ->get();
+            $teachers = User::role('quran_teacher')->where('school_id' , $quranClass->quranLevel->school_id)->get();
+        } else if ($role === 'quran_supervisor') {
+            // في حالة مشرف القرآن، يمكن عرض تفاصيل الحلقة الخاصة بالمدرسة التي يديرها
+            if ($quranClass->quranLevel->school_id !== $user->school_id) {
+                return redirect()->route('quran-classes.index')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الحلقة.');
+            }
+            $quranLevel = QuranLevel::where('school_id', $user->school_id)->get();
+            $teachers = User::role('quran_teacher')->where('school_id', $user->school_id)->get();
+        } else {
+            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
+
+        
         return view('quran-classes.edit', compact('quranClass', 'quranLevel', 'teachers'));
     }
 

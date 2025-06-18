@@ -39,9 +39,6 @@
                 </label>
                 <select name="grade_id" id="grade_id" class="form-select @error('grade_id') is-invalid @enderror" required>
                     <option value="">-- اختر الصف --</option>
-                    @foreach($grades as $grade)
-                        <option value="{{ $grade->id }}" {{ old('grade_id') == $grade->id ? 'selected' : '' }}>{{ $grade->name }}</option>
-                    @endforeach
                 </select>
                 @error('grade_id')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -67,4 +64,32 @@
         </form>
     </div>
 </div>
+<script>
+    document.getElementById('school_id').addEventListener('change', function () {
+        var schoolId = this.value;
+        var gradeSelect = document.getElementById('grade_id');
+        
+        gradeSelect.innerHTML = '<option value="">جاري التحميل...</option>';
+
+        if (schoolId) {
+            fetch('grades-by-school/' + schoolId)
+                .then(response => response.json())
+                .then(data => {
+                    gradeSelect.innerHTML = '<option value="">-- اختر الصف --</option>';
+                    data.forEach(function (grade) {
+                        let option = document.createElement('option');
+                        option.value = grade.id;
+                        option.text = grade.name;
+                        gradeSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    gradeSelect.innerHTML = '<option value="">حدث خطأ أثناء تحميل الصفوف</option>';
+                });
+        } else {
+            gradeSelect.innerHTML = '<option value="">-- اختر الصف --</option>';
+        }
+    });
+</script>
 @endsection
+
