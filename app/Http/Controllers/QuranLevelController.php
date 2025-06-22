@@ -195,4 +195,22 @@ class QuranLevelController extends Controller
 
         return view('quran-levels.by-school', compact('quranLevels', 'schoolName'));
     }
+
+    // في QuranLevelController.php
+
+    public function getJsonQuranLevelsBySchool(Request $request)
+    {
+        $schoolId = $request->get('schoolId');
+        // dd($schoolId);
+        if (!$schoolId) {
+            return response()->json([], 400); // خطأ لأن معرف المدرسة غير موجود
+        }
+
+        $levels = QuranLevel::where('school_id', $schoolId)
+                            ->select('id', 'name')
+                            ->get();
+
+        return response()->json($levels);
+    }
+
 }

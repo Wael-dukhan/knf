@@ -50,7 +50,7 @@
 
     <form>
         @csrf
-        <input type="hidden" id="term_id" value="{{ $currentTerm->id }}">
+        <input type="hidden" id="term_id" value="{{ $currentTerm->id ?? '' }}">
         <input type="hidden" id="school_id" value="{{ $quranClass->quranLevel->school_id }}">
         <input type="hidden" id="quran_class_id" value="{{ $quranClass->id }}">
 

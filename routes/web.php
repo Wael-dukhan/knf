@@ -28,6 +28,7 @@ use App\Http\Controllers\QuranLevelController;
 use App\Http\Controllers\QuranClassesController;
 use App\Http\Controllers\QuranTeacherAttendanceController;
 use App\Http\Controllers\QuranStudentAttendanceController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -125,6 +126,8 @@ Route::middleware(['auth', 'role:super_admin|school_manager|quran_supervisor'])-
     Route::put('/users/{user}', [UserManagementController::class, 'update'])->name('users.update'); // للتحديث
     Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy'); // للحذف
 
+    Route::get('/schools/{schoolId}/quran-teachers', [QuranClassesController::class, 'getQuranTeachersBySchool'])->name('schools.quran-teachers');
+
     Route::resource('schools', SchoolController::class);
     
     Route::resource('academic_years', AcademicYearController::class);
@@ -134,7 +137,7 @@ Route::middleware(['auth', 'role:super_admin|school_manager|quran_supervisor'])-
     Route::resource('grades', GradeController::class);
 
     Route::get('class_sections/grades-by-school/{school_id}', [GradeController::class, 'getGradesBySchool'])->name('grades.by_school');
-    
+
     Route::resource('class_sections', ClassSectionController::class);
 
 
@@ -197,7 +200,9 @@ Route::resource('quran-classes', QuranClassesController::class);
 
 Route::get('/schools/{schoolId}/quran-levels', [App\Http\Controllers\QuranLevelController::class, 'getQuranLevelsBySchool'])
     ->name('schools.quran-levels');
-use App\Http\Controllers\QuranClassController;
+
+Route::get('/schools/{schoolId}/quran-levels/json', [App\Http\Controllers\QuranLevelController::class, 'getJsonQuranLevelsBySchool'])
+    ->name('schools.quran-levels.json');
 
 Route::prefix('quran-classes')->group(function () {
 

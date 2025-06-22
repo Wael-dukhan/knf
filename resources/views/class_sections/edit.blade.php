@@ -89,7 +89,8 @@
         const baseUrl = window.location.pathname.split('/').slice(0,3).join('/') + '/';
 
         if (schoolId) {
-            fetch(baseUrl + 'admin/class_sections/grades-by-school/' + schoolId)
+            const url = `{{ route('admin.grades.by_school', ':school_id') }}`.replace(':school_id', schoolId);
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     gradeSelect.innerHTML = '<option value="">-- اختر الصف --</option>';

@@ -90,7 +90,7 @@
     </div>
 </div>
 <div class="col-auto text-end float-end ms-auto">
-    <a href="{{ route('quran-levels.show', $quranClass->id) }}" class="btn btn-secondary">
+    <a href="{{ route('quran-levels.show', $quranClass->quran_level_id) }}" class="btn btn-secondary">
         <i class="feather-arrow-left"></i> {{ __('messages.back') }}
     </a>
 </div>

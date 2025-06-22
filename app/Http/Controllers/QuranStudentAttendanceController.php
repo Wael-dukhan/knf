@@ -31,10 +31,10 @@ class QuranStudentAttendanceController extends Controller
             ->whereNull('deleted_at') // تأكد من عدم حذف الفصل الدراسي
             ->first();
 
-        if (!$currentTerm) {
-            return redirect()->route('admin.terms.create')
-                ->with('error', 'لا يوجد فصل دراسي نشط حالياً.');
-        }
+        // if (!$currentTerm) {
+        //     return redirect()->route('admin.terms.create')
+        //         ->with('error', 'لا يوجد فصل دراسي نشط حالياً.');
+        // }
 
         $attendanceRecords = QuranStudentAttendanceRecord::whereIn('student_id', $students->pluck('id'))
             ->where('quran_class_id', $quranClassId)
