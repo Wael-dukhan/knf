@@ -69,19 +69,35 @@ class ClassSectionController extends Controller
 
     public function edit(ClassSection $class_section)
     {
-        $grades = Grade::all();
-        $schools = School::all();
+        // $grades = Grade::all();
+        // $schools = School::all();
+         // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // في حالة المشرف العام، يمكن عرض جميع الصفوف
+        if ($role === 'super_admin') {
+            $grades = Grade::all();
+            $schools = School::all(); // إذا كنت تريد تحديد المدرسة أيضًا
+        } else if ($role === 'school_manager') {
+            // في حالة مدير المدرسة، يمكن عرض الصفوف الخاصة بالمدرسة التي يديرها
+            $grades = Grade::where('school_id', $user->school_id)->get();
+            $schools = School::where('id', $user->school_id)->get();
+        } else {
+            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+        }
         return view('class_sections.edit', compact('class_section', 'grades', 'schools'));
     }
     
 
     public function update(Request $request, ClassSection $class_section)
     {
+        // dd($request->all());
         $request->validate([
             'name' => [
                 'required',
                 Rule::unique('grades')->where(function ($query) use ($request) {
-                    return $query->where('grade_id', $request->grade_id)
+                    return $query->where('id', $request->grade_id)
                                 ->whereNull('deleted_at'); // تجاهل السجلات المحذوفة ناعماً
                 }),
             ],
@@ -91,7 +107,7 @@ class ClassSectionController extends Controller
             'grade_id' => 'required|exists:grades,id',
             'school_id' => 'required|exists:schools,id',
         ]);
-    
+
         $class_section->update($request->only(['name', 'grade_id', 'school_id']));
     
         return redirect()->route('admin.grades.show',$request->grade_id)->with('success', 'تم تحديث الشعبة بنجاح');

@@ -19,33 +19,7 @@
             @csrf
             @method('PUT')
 
-            <div class="mb-3">
-                <label for="name" class="form-label">
-                    اسم الشعبة <span class="text-danger">*</span>
-                </label>
-                <input type="text" name="name" id="name" value="{{ old('name', $class_section->name) }}" class="form-control @error('name') is-invalid @enderror" required>
-                @error('name')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="mb-3">
-                <label for="grade_id" class="form-label">
-                    الصف الدراسي <span class="text-danger">*</span>
-                </label>
-                <select name="grade_id" id="grade_id" class="form-select @error('grade_id') is-invalid @enderror" required>
-                    <option value="">-- اختر الصف --</option>
-                    @foreach($grades as $grade)
-                        <option value="{{ $grade->id }}" {{ $grade->id == $class_section->grade_id ? 'selected' : '' }}>
-                            {{ $grade->name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('grade_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-
+            {{-- المدرسة --}}
             <div class="mb-3">
                 <label for="school_id" class="form-label">
                     المدرسة <span class="text-danger">*</span>
@@ -63,6 +37,37 @@
                 @enderror
             </div>
 
+            {{-- الصف الدراسي --}}
+            <div class="mb-3">
+                <label for="grade_id" class="form-label">
+                    الصف الدراسي <span class="text-danger">*</span>
+                </label>
+                <select name="grade_id" id="grade_id" class="form-select @error('grade_id') is-invalid @enderror" required>
+                    <option value="">-- اختر الصف --</option>
+                    @foreach($grades as $grade)
+                        @if($grade->school_id == $class_section->grade->school_id)
+                            <option value="{{ $grade->id }}" {{ $grade->id == $class_section->grade_id ? 'selected' : '' }}>
+                                {{ $grade->name }}
+                            </option>
+                        @endif
+                    @endforeach
+                </select>
+                @error('grade_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- اسم الشعبة --}}
+            <div class="mb-3">
+                <label for="name" class="form-label">
+                    اسم الشعبة <span class="text-danger">*</span>
+                </label>
+                <input type="text" name="name" id="name" value="{{ old('name', $class_section->name) }}" class="form-control @error('name') is-invalid @enderror" required>
+                @error('name')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
             <div class="d-flex justify-content-between mt-4">
                 <a href="{{ route('admin.grades.show' , $class_section->grade_id) }}" class="btn btn-secondary">
                     <i class="feather-arrow-left"></i> رجوع
@@ -74,4 +79,33 @@
         </form>
     </div>
 </div>
+
+{{-- سكربت لتحميل الصفوف حسب المدرسة --}}
+<script>
+    document.getElementById('school_id').addEventListener('change', function () {
+        var schoolId = this.value;
+        var gradeSelect = document.getElementById('grade_id');
+        gradeSelect.innerHTML = '<option value="">جاري التحميل...</option>';
+        const baseUrl = window.location.pathname.split('/').slice(0,3).join('/') + '/';
+
+        if (schoolId) {
+            fetch(baseUrl + 'admin/class_sections/grades-by-school/' + schoolId)
+                .then(response => response.json())
+                .then(data => {
+                    gradeSelect.innerHTML = '<option value="">-- اختر الصف --</option>';
+                    data.forEach(function (grade) {
+                        var option = document.createElement('option');
+                        option.value = grade.id;
+                        option.text = grade.name;
+                        gradeSelect.appendChild(option);
+                    });
+                })
+                .catch(() => {
+                    gradeSelect.innerHTML = '<option value="">حدث خطأ أثناء تحميل الصفوف</option>';
+                });
+        } else {
+            gradeSelect.innerHTML = '<option value="">-- اختر الصف --</option>';
+        }
+    });
+</script>
 @endsection

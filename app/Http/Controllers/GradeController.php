@@ -88,6 +88,8 @@ class GradeController extends Controller
 
     public function update(Request $request, Grade $grade)
     {
+        // dd($grade);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'academic_year_id' => 'required|exists:academic_years,id',
@@ -95,8 +97,14 @@ class GradeController extends Controller
             'grade_level' => 'required|in:1,2,3', // التأكد أن القيمة تكون واحدة من 1 أو 2 أو 3
         ]);
 
-        $grade->update($request->all());
-        return redirect()->route('admin.grades.index')->with('success', 'تم التحديث بنجاح');
+        // $grade->update($request->all());
+        $grade->update([
+            'name' => $request->name,
+            'academic_year_id' => $request->academic_year_id,
+            'description' => $request->description,
+            'grade_level' => $request->grade_level,
+        ]);
+        return redirect()->route('grade_levels.show',['school'=>$grade->school_id , 'grade_level' => $request->grade_level])->with('success', 'تم التحديث بنجاح');
     }
 
     public function destroy(Grade $grade)
@@ -124,7 +132,7 @@ class GradeController extends Controller
 
     public function getGradesBySchool($school_id)
     {
-        $grades = Grade::where('school_id', $school_id)->get();
+        $grades = Grade::where('school_id', $school_id)->select('id', 'name')->get();
 
         return response()->json($grades);
     }

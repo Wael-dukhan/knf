@@ -43,6 +43,20 @@
                 </select>
             </div>
 
+            <div class="mb-3">
+                <label for="grade_level" class="form-label">المستوى الدراسي <span class="text-danger">*</span></label>
+                <select name="grade_level" id="grade_level" class="form-select @error('grade_level') is-invalid @enderror" required>
+                    <option value="">-- اختر المستوى --</option>
+                    <option value="1" {{ old('grade_level', $grade->grade_level) == "1" ? 'selected' : '' }}>1</option>
+                    <option value="2" {{ old('grade_level', $grade->grade_level) == "2" ? 'selected' : '' }}>2</option>
+                    <option value="3" {{ old('grade_level', $grade->grade_level) == "3" ? 'selected' : '' }}>3</option>
+                </select>
+                @error('grade_level')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+
             <a href="{{ route('grade_levels.show',[$grade->school_id , $grade->grade_level]) }}" class="btn btn-secondary">{{ __('messages.cancel') }}</a>
             <button type="submit" class="btn btn-primary">{{ __('messages.update') }}</button>
         </form>

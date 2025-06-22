@@ -280,4 +280,7 @@ return [
     'not_defined' => 'غير محدد',
     'quran_teacher' => 'معلم القرآن',
     'quran_supervisor' => 'مشرف حلقات القرآن',
+    'no_current_term' => 'لا يوجد فصل دراسي حالي.',
+    'no_students_in_class' => 'لا يوجد طلاب في هذه الشعبة.',
+    'no_description' => 'لا يوجد وصف متاح.',
 ];

@@ -4,32 +4,39 @@
 
 @section('content')
 <style>
-    .custom-info{
+    .custom-info {
         display: grid;
         grid-template-columns: 50% 50%;
     }
 </style>
+
 <div class="">
     <div class="">
         <div class="card shadow-sm mb-4">
             <div class="card-body">
-            <div class="mb-4 custom-info">
-                <h5 class="card-title text-primary mb-3">
-                    <i class="fas fa-school"></i> {{ __('messages.basic_information') }}
-                </h5>
-                <div class="d-flex align-items-center flex-wrap gap-2">
-                    <button type="button" class="btn btn-outline-secondary me-2" onclick="adjustDate(-1)">
-                        <i class="fas fa-arrow-left"></i> {{ __('messages.previous_day') }}
-                    </button>
+                <div class="mb-4 custom-info">
+                    <h5 class="card-title text-primary mb-3">
+                        <i class="fas fa-school"></i> {{ __('messages.basic_information') }}
+                    </h5>
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <button type="button" class="btn btn-outline-secondary me-2" onclick="adjustDate(-1)">
+                            <i class="fas fa-arrow-left"></i> {{ __('messages.previous_day') }}
+                        </button>
 
-                    <input type="date" id="date" name="date" class="form-control text-center me-2"
-                        style="max-width: 200px;" value="{{ request('date', date('Y-m-d')) }}">
+                        <input type="date" id="date" name="date" class="form-control text-center me-2"
+                            style="max-width: 200px;" value="{{ request('date', date('Y-m-d')) }}">
 
-                    <button type="button" class="btn btn-outline-secondary" onclick="adjustDate(1)">
-                        {{ __('messages.next_day') }} <i class="fas fa-arrow-right"></i>
-                    </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="adjustDate(1)">
+                            {{ __('messages.next_day') }} <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
+
+                @if(!$currentTerm)
+                    <div class="alert alert-warning">
+                        {{ __('messages.no_current_term') ?? 'لا يوجد فصل دراسي حالي، يرجى إنشاء فصل دراسي أولاً.' }}
+                    </div>
+                @endif
 
                 <div class="row mb-3">
                     <div class="col-md-6 mb-2">
@@ -47,6 +54,7 @@
                 </div>
             </div>
         </div>
+
         <script>
             function adjustDate(offset) {
                 const dateInput = document.getElementById('date');
@@ -64,9 +72,10 @@
                 window.location.search = params.toString();
             });
         </script>
+
         <form>
             @csrf
-            <input type="hidden" id="term_id" value="{{ $currentTerm->id }}">
+            <input type="hidden" id="term_id" value="{{ $currentTerm->id ?? '' }}">
             <input type="hidden" id="school_id" value="{{ $schoolId }}">
 
             <div class="card card-table">
@@ -112,7 +121,8 @@
                                                     name="attendance[{{ $teacher->id }}][status]"
                                                     id="{{ $status }}_{{ $teacher->id }}"
                                                     value="{{ $status }}"
-                                                    {{ $selectedStatus === $status ? 'checked' : '' }}>
+                                                    {{ $selectedStatus === $status ? 'checked' : '' }}
+                                                    {{ !$currentTerm ? 'disabled' : '' }}>
                                                 <label class="form-check-label"
                                                     for="{{ $status }}_{{ $teacher->id }}">{{ __('messages.' . $status) }}</label>
                                             </div>
@@ -122,7 +132,8 @@
                                         <input type="text" name="attendance[{{ $teacher->id }}][notes]"
                                             class="form-control"
                                             placeholder="{{ __('messages.optional_notes') }}"
-                                            value="{{ $notes }}">
+                                            value="{{ $notes }}"
+                                            {{ !$currentTerm ? 'disabled' : '' }}>
                                     </td>
                                 </tr>
                             @endforeach
@@ -143,7 +154,8 @@
 @push('scripts')
 <script>
 $(document).ready(function () {
-        const table = $('#attendanceTable').DataTable({
+    const termId = $('#term_id').val();
+    const table = $('#attendanceTable').DataTable({
         dom: 'Bfrtip',
         order: [[0, 'asc']],
         orderCellsTop: true,
@@ -176,9 +188,9 @@ $(document).ready(function () {
                 }
             }
         ],
-         columnDefs: [
+        columnDefs: [
             {
-                targets: 3, // عمود الملاحظات
+                targets: 3,
                 render: function (data, type, row, meta) {
                     if (type === 'filter') {
                         const inputElement = $('<div>').html(data).find('input').val();
@@ -190,7 +202,11 @@ $(document).ready(function () {
         ]
     });
 
-    // تحديث data-status مبدئيًا
+    if (!termId) {
+        console.warn('لا يوجد فصل دراسي حالي');
+        return;
+    }
+
     $('#attendanceTable tbody tr').each(function () {
         const selectedStatus = $(this).find('.attendance-status:checked').val();
         $(this).attr('data-status', selectedStatus);
@@ -201,7 +217,6 @@ $(document).ready(function () {
         const status = $row.find('.attendance-status:checked').val();
         const notes = $row.find('input[name^="attendance"][name$="[notes]"]').val();
         const date = $('#date').val();
-        const termId = $('#term_id').val();
         const schoolId = $('#school_id').val();
 
         $.ajax({
@@ -234,7 +249,6 @@ $(document).ready(function () {
         }
     }
 
-    // حالة الحضور
     $('#attendanceTable').on('change', '.attendance-status', function () {
         const $row = $(this).closest('tr');
         const selectedStatus = $(this).val();
@@ -242,7 +256,6 @@ $(document).ready(function () {
         saveAttendance($row);
     });
 
-    // ملاحظات
     const debouncedSave = debounce(function () {
         const $row = $(this).closest('tr');
         saveAttendance($row);
@@ -250,7 +263,6 @@ $(document).ready(function () {
 
     $('#attendanceTable').on('input', 'input[name^="attendance"][name$="[notes]"]', debouncedSave);
 
-      // الفلاتر
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
         const selectedStatus = $('#statusSearch').val();
         if (selectedStatus === 'all') return true;

@@ -133,9 +133,10 @@ Route::middleware(['auth', 'role:super_admin|school_manager|quran_supervisor'])-
     
     Route::resource('grades', GradeController::class);
 
+    Route::get('class_sections/grades-by-school/{school_id}', [GradeController::class, 'getGradesBySchool'])->name('grades.by_school');
+    
     Route::resource('class_sections', ClassSectionController::class);
 
-    Route::get('class_sections/grades-by-school/{school_id}', [GradeController::class, 'getGradesBySchool'])->name('grades.by_school');
 
 });
 
