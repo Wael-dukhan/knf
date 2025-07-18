@@ -27,6 +27,7 @@ class MaterialController extends Controller
             $materials = Material::with('grade')->whereHas('grade', function ($query) use ($user) {
                 $query->where('school_id', $user->school_id);
             })->get();
+            
         } else if ($role === 'teacher' || $role === 'quran_teacher') {
             // في حالة المعلم أو معلم القرآن، يمكن عرض المواد التي يدرسها
             $materials = Material::with('grade')->whereHas('grade.teachers', function ($query) use ($user) {

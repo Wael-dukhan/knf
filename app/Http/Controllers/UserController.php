@@ -73,25 +73,25 @@ class UserController extends Controller
     
     public function store(Request $request)
     {
-        // dd($request->all());
         // التحقق من أن هناك مديرًا في نفس المدرسة
         if ($request->role_id == 2 && User::where('school_id', $request->school_id)
             ->whereHas('roles', function ($query) {
-                $query->where('name', 'manager');
-            })->exists()) {
-            return redirect()->back()->withErrors(['school_id' => 'هناك مدير موجود بالفعل لهذه المدرسة.']);
-        }
-
-        // التحقق من صحة البيانات
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'role_id' => 'required|exists:roles,id',
-            'school_id' => 'required|exists:schools,id', // تأكيد أن المدرسة موجودة
-            'gender' => 'required|in:male,female'
-        ]);
-
+        $query->where('name', 'manager');
+    })->exists()) {
+        return redirect()->back()->withErrors(['school_id' => 'هناك مدير موجود بالفعل لهذه المدرسة.']);
+    }
+    
+    // التحقق من صحة البيانات
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:6',
+        'role_id' => 'required|exists:roles,id',
+        'school_id' => 'required|exists:schools,id', // تأكيد أن المدرسة موجودة
+        'gender' => 'required|in:male,female'
+    ]);
+    
+    // dd($request->all());
         // إنشاء المستخدم الجديد
         $user = User::create([
             'name' => $request->name,

@@ -9915,7 +9915,7 @@ body[data-layout-mode=dark] .alertify .ajs-footer .ajs-buttons .ajs-button.ajs-o
     }
 
     .mini-sidebar .menu-toggle #toggle_btn {
-        left: 5px
+        left: -45px;
     }
 
     .menu-toggle {

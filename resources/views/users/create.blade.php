@@ -64,13 +64,13 @@
                     </div>
 
                     <div class="form-group col-md-6">
-                        <label for="grade">{{ __('messages.select_gender') }} <span class="text-danger">*</span></label>
-                        <select name="grade_id" id="grade" class="form-control" required>
+                        <label for="gender">{{ __('messages.select_gender') }} <span class="text-danger">*</span></label>
+                        <select name="gender" id="grade" class="form-control" required>
                             <option value="">{{ __('messages.select_gender') }}</option>
                             <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>{{ __('messages.male') }}</option>
                             <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>{{ __('messages.female') }}</option>
                         </select>
-                        @error('grade_id')
+                        @error('gender')
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>

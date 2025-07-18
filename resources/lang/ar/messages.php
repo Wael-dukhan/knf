@@ -52,7 +52,7 @@ return [
     'print' => 'تصدير إلى PDF',
     'number' => 'رقم',
     'description' => 'الوصف',
-    'create_new_grade' => 'إضافة مرحلة جديدة',
+    'create_new_grade' => 'إضافة صف جديد',
     'are_you_sure' => 'هل أنت متأكد؟',
     'grades_list' => 'قائمة الصفوف',
     'academic_year' => 'السنة الدراسية',
