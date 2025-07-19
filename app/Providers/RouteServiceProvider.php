@@ -17,7 +17,8 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/admin/schools';
+    public const HOME = '/my-profile';
+    // public const HOME = \App\Http\Controllers\Auth\LoginController::redirectTo();
 
     /**
      * Define your route model bindings, pattern filters, and other route configuration.

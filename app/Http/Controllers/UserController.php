@@ -8,6 +8,8 @@ use App\Models\AcademicYear;
 use App\Models\School;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+
 
 class UserController extends Controller
 {
@@ -206,4 +208,44 @@ class UserController extends Controller
         $user->delete();
         return redirect()->route('users.index');
     }
+
+    public function showCurrentUser()
+    {
+        $user = auth()->user();
+
+        // تحميل العلاقات مثل المدرسة وأولياء الأمور
+        $user->load(['school', 'parents']);
+
+        $educationHistoryArray = DB::select("
+            SELECT 
+                academic_years.name AS year_name,
+                grades.name AS grade_name,
+                class_sections.name AS section_name,
+                class_sections.id AS class_section_id,
+                student_class_section.status,
+                schools.name AS school_name 
+            FROM student_class_section
+            INNER JOIN class_sections ON student_class_section.class_section_id = class_sections.id
+            INNER JOIN grades ON class_sections.grade_id = grades.id
+            INNER JOIN academic_years ON student_class_section.academic_year_id = academic_years.id
+            INNER JOIN schools ON grades.school_id = schools.id
+            WHERE student_class_section.user_id = ?
+            AND student_class_section.deleted_at IS NULL
+            ORDER BY academic_years.start_date ASC
+        ", [$user->id]);
+
+        $educationHistory = collect($educationHistoryArray);
+
+        $roles = $user->getRoleNames();
+        $firstRole = $roles->first();
+
+        $parents = DB::table('parent_student')
+            ->join('users as parents', 'parent_student.parent_id', '=', 'parents.id')
+            ->where('parent_student.student_id', $user->id)
+            ->select('parents.id', 'parents.name', 'parents.email')
+            ->get();
+        
+        return view('admin.users.show', compact('user', 'educationHistory','firstRole' , 'parents'));
+    }
+
 }

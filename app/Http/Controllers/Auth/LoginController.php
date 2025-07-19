@@ -25,7 +25,8 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    // protected $redirectTo = '/home';
+    protected $redirectTo = self::redirectTo();
 
     /**
      * Create a new controller instance.
@@ -37,4 +38,27 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
         $this->middleware('auth')->only('logout');
     }
+
+    public static function redirectTo()
+    {
+        $user = auth()->user();
+
+        if ($user->hasRole('super_admin')) {
+            return '/home';
+        } elseif ($user->hasRole('school_manager')) {
+            return 'my-school/grade_levels';
+        } elseif ($user->hasRole('teacher')) {
+            return '/teacher/grades';
+        } elseif ($user->hasRole('quran_teacher')) {
+            return '/quran-teacher/myLevelsWithClasses';
+        } elseif ($user->hasRole('parent')) {
+            return '/teacher/dashboard';
+        } elseif ($user->hasRole('student')) {
+            return '/student/dashboard';
+        } 
+        else {
+            return '/home'; // القيمة الافتراضية
+        }
+    }
+
 }

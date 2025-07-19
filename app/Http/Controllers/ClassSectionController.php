@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ClassSectionController extends Controller
 {
@@ -140,10 +141,47 @@ class ClassSectionController extends Controller
             ->get();
 
         $grade = $class_section->grade;
-    
+        // dd($class_section);
         return view('class_sections.show', compact('class_section', 'students','grade'));
     }
     
+
+   public function showTeacherClasses()
+    {
+        $user = Auth::user();
+
+        if (!$user->hasRole('teacher')) {
+            abort(403, 'ليست لديك صلاحية لعرض هذه الصفحة.');
+        }
+
+        // جلب كل الشعب المرتبطة بالمعلم عبر المواد، مع معلومات الصف وسنة الدراسة
+        $classSections = DB::table('material_teacher_term_class_section as mttcs')
+            ->join('class_sections as cs', 'mttcs.class_section_id', '=', 'cs.id')
+            ->join('grades as g', 'cs.grade_id', '=', 'g.id')
+            ->join('academic_years as ay', 'mttcs.academic_year_id', '=', 'ay.id')
+            ->where('mttcs.teacher_id', $user->id)
+            ->select(
+                'cs.*',
+                'g.name as grade_name',
+                'ay.name as academic_year_name'
+            )
+            ->distinct()
+            ->get();
+
+        // لكل شعبة جلب الطلاب المنتمين لها
+        foreach ($classSections as $section) {
+            $section->students = DB::table('student_class_section as scs')
+                ->join('users', 'scs.user_id', '=', 'users.id')
+                ->where('scs.class_section_id', $section->id)
+                ->whereNull('scs.deleted_at')
+                ->select('users.id', 'users.name', 'users.email', 'scs.status')
+                ->get();
+        }
+
+        return view('teacher.class_sections.index', compact('classSections'));
+    }
+
+
     // ClassSectionController.php
 
     public function assignStudents($classSectionId)
@@ -172,5 +210,6 @@ class ClassSectionController extends Controller
         return redirect()->route('class-sections.show', $classSectionId)
                         ->with('success', 'تم إسناد الطلاب للشعبة بنجاح.');
     }
+
 
 }

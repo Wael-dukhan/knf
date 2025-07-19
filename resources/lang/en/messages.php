@@ -163,4 +163,9 @@ return [
     'no_materials_available' => 'No materials available for this grade.',
     'create_quran_class' => 'Create Quran Class',
     'quran_level' => 'Quran Level',
+    'my_assigned_grades_sections' => 'My Assigned Grades and Sections',
+    'my_classes' => 'My Class Sections',
+    'my_quran_classes' => 'My Quran Classes',
+    'no_levels_found_for_teacher' => 'no levels found for teacher',
+    'no_classes_for_level' => 'no classes for level'
 ];

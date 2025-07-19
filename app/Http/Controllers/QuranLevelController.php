@@ -196,6 +196,30 @@ class QuranLevelController extends Controller
         return view('quran-levels.by-school', compact('quranLevels', 'schoolName'));
     }
 
+    public function myLevelsWithClasses()
+    {
+        $user = auth()->user();
+
+        // جلب حلقات المعلم مع تحميل المستوى المرتبط بكل حلقة
+        $quranClasses = $user->quranClasses()->with('quranLevel')->get();
+        // تجميع الحلقات حسب المستوى
+        $levelsWithClasses = $quranClasses->groupBy(function ($class) {
+            return $class->quranLevel->id;
+        });
+        
+        // تجهيز مصفوفة المستويات مع الحلقات
+        $levels = $levelsWithClasses->map(function ($classes, $levelId) {
+            return [
+                'level' => $classes->first()->quranLevel,
+                'classes' => $classes,
+            ];
+        })->values();
+        
+        // dd($levelsWithClasses);
+        return view('quran-levels.my-levels-with-classes', compact('levels'));
+    }
+
+
     // في QuranLevelController.php
 
     public function getJsonQuranLevelsBySchool(Request $request)

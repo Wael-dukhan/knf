@@ -13,7 +13,8 @@
         <div class="card shadow-sm p-4 mb-4" style="background-color: #fff;">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">
-                    {{ __('messages.class_section_details') }}: <span class="text-primary">{{ $grade->school->name }} - {{ $grade->name }} - {{ $class_section->name }} [ {{ $grade->academicYear->name }} ]</span>
+                    {{ __('messages.class_section_details') }}: <span class="text-primary">
+                        {{ $grade->school->name ?? '-' }} - {{ $grade->name ?? '-' }} - {{ $class_section->name ?? '-' }} [ {{ $grade->academicYear->name ?? '-' }} ]</span>
                 </h2>
                 <a href="{{ route('student.assign.create', ['gradeId' => $grade->id]) }}" class="btn btn-outline-primary">
                     <i class="feather-list"></i> {{ __('messages.assign_student_to_class_section') }}

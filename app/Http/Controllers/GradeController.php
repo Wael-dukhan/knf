@@ -130,6 +130,30 @@ class GradeController extends Controller
         return view('grades.show', compact('grade', 'totalStudents'));
     }
 
+    public function showTeacherGrades()
+    {
+        $user = auth()->user();
+
+        if (!$user->hasRole('teacher')) {
+            abort(403, 'ليست لديك صلاحية لعرض هذه الصفحة.');
+        }
+
+        // جلب كل الشعب التي يدرسها المعلم مع بيانات الصف وسنة الدراسة
+        $classSections = $user->classSectionsTeacher()
+            ->with('grade.school', 'grade.academicYear')  // تحميل الصف، المدرسة، والسنة الدراسية
+            ->withCount(['users as student_count' => function ($query) {
+                $query->whereHas('roles', fn($q) => $q->where('name', 'student'));
+            }])
+            ->get();
+            // تجميع الشعب حسب الصف
+            $grades = $classSections->groupBy('grade_id');
+            
+            // dd($classSections);
+        return view('teacher.grades.index', compact('grades'));
+    }
+
+
+
     public function getGradesBySchool($school_id)
     {
         $grades = Grade::where('school_id', $school_id)->select('id', 'name')->get();

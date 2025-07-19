@@ -134,7 +134,7 @@
                         <p class="text-muted mb-0">{{__('messages.'.Auth::user()->getRoleNames()->first())}}</p>
                     </div>
                 </div>
-                <a class="dropdown-item" href="{{ route('profile.edit') }}">My Profile</a>
+                <a class="dropdown-item" href="{{ route('profile.show') }}">My Profile</a>
                 <a class="dropdown-item" href="">Inbox</a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                     @csrf

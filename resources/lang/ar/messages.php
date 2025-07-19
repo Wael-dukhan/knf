@@ -288,5 +288,10 @@ return [
     'error_loading_levels' => 'خطأ في تحميل المستويات، يرجى المحاولة مرة أخرى لاحقًا.',
     'choose_school' => 'اختر المدرسة',
     'error_loading_teachers' => 'خطأ في تحميل المعلمين، يرجى المحاولة مرة أخرى لاحقًا.',
+    'my_assigned_grades_sections' => 'الصفوف والشعب المخصصة لي',
+    'my_classes' => 'الشعب الدراسية', 
+    'my_quran_classes' => 'حلقاتي القرأنية',
+    'no_levels_found_for_teacher' => 'لا يوجد مستويات قرآنية لهذا المعلم',
+    'no_classes_for_level' => 'لا يوجد حلقات في هذا المستوى',
     
 ];

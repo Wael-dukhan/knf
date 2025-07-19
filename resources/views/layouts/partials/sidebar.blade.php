@@ -345,14 +345,92 @@
                         </ul>
                     </li>
                 @elseif (Auth::user()->hasRole('teacher'))
+                    <li class="submenu">
+                        <a href="#">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span> {{ __('messages.my_classes') }}</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="{{ route('teacher.grades.show') }}"
+                                class="{{ request()->routeIs('teacher.grades.show') ? 'active' : '' }}">
+                                    {{ __('messages.view_class_sections') }}
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
 
                 @elseif (Auth::user()->hasRole('quran_teacher'))
+                    <li class="submenu">
+                        <a href="#">
+                            <i class="fas fa-book-open"></i>
+                            <span> {{ __('messages.quran_sessions') }}</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="{{ route('quran-teacher.myLevelsWithClasses') }}"
+                                class="{{ request()->routeIs('quran-teacher.myLevelsWithClasses') ? 'active' : '' }}">
+                                    {{ __('messages.my_quran_classes') }}
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
 
                 @elseif (Auth::user()->hasRole('parent'))
-                
-                @elseif (Auth::user()->hasRole('student'))
+                    <li class="submenu">
+                        <a href="#">
+                            <i class="fas fa-users"></i>
+                            <span> {{ __('messages.children') }}</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="{{ route('parent.children.index') }}"
+                                class="{{ request()->routeIs('parent.children.index') ? 'active' : '' }}">
+                                    {{ __('messages.children_list') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('parent.attendance.index') }}"
+                                class="{{ request()->routeIs('parent.attendance.index') ? 'active' : '' }}">
+                                    {{ __('messages.attendance_reports') }}
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
 
+                @elseif (Auth::user()->hasRole('student'))
+                    <li class="submenu">
+                        <a href="#">
+                            <i class="fas fa-user-graduate"></i>
+                            <span> {{ __('messages.my_profile') }}</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="{{ route('student.profile') }}"
+                                class="{{ request()->routeIs('student.profile') ? 'active' : '' }}">
+                                    {{ __('messages.view_profile') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('student.schedule') }}"
+                                class="{{ request()->routeIs('student.schedule') ? 'active' : '' }}">
+                                    {{ __('messages.my_schedule') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('student.quran.progress') }}"
+                                class="{{ request()->routeIs('student.quran.progress') ? 'active' : '' }}">
+                                    {{ __('messages.quran_progress') }}
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 @endif
+
                 {{-- <li class="submenu active">
                     <a href="#"
                         ><i class="fas fa-building"></i>

@@ -143,8 +143,16 @@ Route::middleware(['auth', 'role:super_admin|school_manager|quran_supervisor'])-
 
 });
 
+Route::middleware(['auth', 'role:teacher'])->prefix('teacher')->name('teacher.')->group(function () {
+    Route::get('/grades', [GradeController::class, 'showTeacherGrades'])->name('grades.show');
+    Route::get('class_sections/{class_section}', [ClassSectionController::class, 'show'])->name('class_sections.show');
+
+});
+
 Route::get('schools/{school}/grade_levels', [App\Http\Controllers\SchoolController::class, 'gradeLevels'])
     ->name('grade_levels.index');
+Route::get('my-school/grade_levels', [App\Http\Controllers\SchoolController::class, 'my_school_gradeLevels'])
+    ->name('my-school-gradeLevels');
 Route::get('schools/{school}/grade_levels/{grade_level}', [App\Http\Controllers\GradeLevelController::class, 'show'])
     ->name('grade_levels.show');
 Route::get('student/class_sections/{classSection}/edit', [StudentClassSectionController::class, 'edit'])
@@ -154,10 +162,13 @@ Route::put('student/class_sections/{classSection}/update', [StudentClassSectionC
 
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/my-profile', [UserController::class, 'showCurrentUser'])->name('profile.show'); // عرض بيانات المستخدم الحالي
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit'); // تعديل بيانات الملف الشخصي
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
 
 
 Route::middleware('auth')->group(function () {
@@ -230,3 +241,18 @@ Route::prefix('quran-teacher-attendance')->middleware(['auth'])->group(function 
 
 Route::get('quran-classes/{quranClass}/attendance', [QuranStudentAttendanceController::class, 'index'])->name('quran_student_attendance.index');
 Route::post('quran-classes/attendance/ajax-update', [QuranStudentAttendanceController::class, 'ajaxUpdate'])->name('quran_student_attendance.ajaxUpdate');
+
+Route::prefix('quran-teacher')->middleware(['auth', 'role:quran_teacher'])->name('quran-teacher.')->group(function () {
+
+    Route::get('myLevelsWithClasses', [QuranLevelController::class, 'myLevelsWithClasses'])->name('myLevelsWithClasses');
+
+    // عرض الحلقات التي يُدرسها معلم القرآن الحالي
+    Route::get('/classes', [QuranClassesController::class, 'index'])
+        ->name('classes.index');
+
+    // عرض صفحة الحضور الخاصة بمعلم الحلقة
+    Route::get('/attendance', [QuranTeacherAttendanceController::class, 'index'])
+        ->name('attendance.index');
+
+});
+

@@ -11,4 +11,8 @@ return [
     'description'     => 'Description',
     'save'            => 'Save',
     'back'            => 'Back',
+    'my_levels' => 'My Quran Levels',
+    'no_levels_found_for_teacher' => 'No Quran levels found for the current teacher.',
+    'no_classes_for_level' => 'No Quran classes linked to this level.',
+    'levels_by_school' => 'Quran Levels by School',
 ];

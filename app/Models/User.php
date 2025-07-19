@@ -132,6 +132,17 @@ class User extends Authenticatable
                     ->wherePivotNull('deleted_at');  // تتجاهل السجلات التي حُذفت soft delete
     }
 
+    public function classSectionsTeacher()
+    {
+        return $this->belongsToMany(ClassSection::class, 'material_teacher_term_class_section', 'teacher_id', 'class_section_id');
+    }
+
+    public function quranClasses()
+    {
+        return $this->hasMany(QuranClass::class, 'teacher_id');
+    }
+
+
     public function activeClassSections()
     {
         return $this->belongsToMany(ClassSection::class, 'student_class_section', 'user_id', 'class_section_id')
@@ -152,13 +163,13 @@ class User extends Authenticatable
         return $this->hasMany(MaterialUserTermSection::class);
     }
 
-    public function quranClasses()
-    {
-        return $this->belongsToMany(QuranClass::class, 'student_quran_classes')
-                    ->withTimestamps()
-                    ->withPivot(['status', 'joined_at', 'completed_at', 'deleted_at'])
-                    ->wherePivotNull('deleted_at');
-    }
+    // public function quranClasses()
+    // {
+    //     return $this->belongsToMany(QuranClass::class, 'student_quran_classes')
+    //                 ->withTimestamps()
+    //                 ->withPivot(['status', 'joined_at', 'completed_at', 'deleted_at'])
+    //                 ->wherePivotNull('deleted_at');
+    // }
 
     
 }

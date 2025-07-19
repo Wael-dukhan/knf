@@ -116,6 +116,13 @@ class SchoolController extends Controller
         return view('grade_levels.index', compact('school', 'gradeLevels'));
     }
 
+    public function my_school_gradeLevels()
+    {
+        $school = School::find(auth()->user()->school_id);
+        $gradeLevels = Grade::GRADE_LEVELS;
+        return view('grade_levels.index', compact('school', 'gradeLevels'));
+    }
+
     public function getAcademicYears($schoolId)
     {
         $school = School::find($schoolId);

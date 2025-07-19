@@ -63,7 +63,7 @@ class UserManagementController extends Controller
                 class_sections.name AS section_name, -- مباشرة من الجدول
                 class_sections.id AS class_section_id, -- مباشرة من الجدول
                 student_class_section.status,
-                schools.name AS school_name
+                schools.name AS school_name 
             FROM student_class_section
             INNER JOIN class_sections ON student_class_section.class_section_id = class_sections.id
             INNER JOIN grades ON class_sections.grade_id = grades.id
@@ -75,7 +75,8 @@ class UserManagementController extends Controller
         ", [$id]);
 
         $educationHistory = collect($educationHistoryArray);
-        $user = auth()->user();
+        // $user = auth()->user();
+        $user = User::with(['school', 'parents'])->findOrFail($id);
         $roles = $user->getRoleNames();  // Collection of role names
         $firstRole = $roles->first();    // أول دور
         // dd($firstRole);
