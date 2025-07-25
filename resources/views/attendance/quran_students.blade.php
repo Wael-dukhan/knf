@@ -114,9 +114,15 @@
                 </table>
 
                 <div class="mt-4">
-                    <a href="{{ route('admin.schools.index') }}" class="btn btn-secondary mt-3">
-                        <i class="feather-arrow-left"></i> {{ __('messages.back') }}
-                    </a>
+                    @if ($role == 'super_admin') 
+                        <a href="{{ route('admin.schools.index') }}" class="btn btn-secondary mt-3">
+                            <i class="feather-arrow-left"></i> {{ __('messages.back') }}
+                        </a>
+                    @elseif ($role == 'quran_supervisor' || $role == 'quran_teacher') 
+                        <a href="{{ route('quran-teacher.myLevelsWithClasses') }}" class="btn btn-secondary mt-3">
+                            <i class="feather-arrow-left"></i> {{ __('messages.back') }}
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>

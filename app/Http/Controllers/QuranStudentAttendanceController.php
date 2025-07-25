@@ -19,7 +19,7 @@ class QuranStudentAttendanceController extends Controller
     {
         $dateString = $request->input('date', date('Y-m-d'));
         $today = time();
-
+        $role = auth()->user()->roles()->first()->name;
         $quranClass = QuranClass::findOrFail($quranClassId);
         $schoolId = $quranClass->quranLevel->school_id;
 
@@ -51,7 +51,8 @@ class QuranStudentAttendanceController extends Controller
             'currentTerm',
             'attendanceRecords',
             'dayName',
-            'dateString'
+            'dateString',
+            'role'
         ));
     }
 
