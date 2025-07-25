@@ -37,7 +37,9 @@ class MaterialTeacherAssignmentController extends Controller
         $materials = $classSection->grade->materials;
         $assignments = MaterialTeacherAssignment::where('class_section_id', $id)->get()->keyBy('material_id');
         // dd($assignments->first()?->id);
-        return view('material_assignments.show', compact('classSection', 'materials', 'assignments'));
+        $role = auth()->user()->roles()->first();
+        // dd($role);
+        return view('material_assignments.show', compact('classSection', 'materials', 'assignments','role'));
     }
 
   public function edit(Request $request, $assignmentId)

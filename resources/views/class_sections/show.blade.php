@@ -3,7 +3,7 @@
 @section('title', __('messages.class_section_details'))
 
 @section('content')
-    <div class="container mt-5">
+    <div class="mt-5">
         <style>
             table.table-bordered.dataTable th, table.table-bordered.dataTable td {
                 text-align: center;
@@ -65,12 +65,14 @@
                                     </td>
                                     <td>
                                         <a href="{{ route('admin.users.show', $student->student_id) }}" class="btn btn-warning btn-sm">{{ __('messages.view_student') }}</a>
-                                        <form action="{{ route('student.class_sections.delete',[$class_section->id , $student->student_id , $grade->academicYear->id ]) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{{ __('messages.are_you_sure') }}')">{{ __('messages.delete') }}</button>
-                                        </form>
-                                        <a href="{{ route('student.class_sections.edit', $student->student_id) }}" class="btn btn-secondary btn-sm">{{ __('messages.move') }}</a>
+                                        @if ($role == 'super_admin' || $role == 'school_manager')
+                                            <form action="{{ route('student.class_sections.delete',[$class_section->id , $student->student_id , $grade->academicYear->id ]) }}" method="POST" style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{{ __('messages.are_you_sure') }}')">{{ __('messages.delete') }}</button>
+                                            </form>
+                                            <a href="{{ route('student.class_sections.edit', $student->student_id) }}" class="btn btn-secondary btn-sm">{{ __('messages.move') }}</a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

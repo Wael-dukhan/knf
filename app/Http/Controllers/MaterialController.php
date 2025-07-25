@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Grade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class MaterialController extends Controller
 {
@@ -35,12 +36,18 @@ class MaterialController extends Controller
             })->get();
         } else if ($role === 'student' || $role === 'parent') {
             // في حالة الطالب أو ولي الأمر، يمكن عرض المواد الخاصة بالصف الذي ينتمي إليه الطالب
-            $materials = Material::with('grade')->whereHas('grade.students', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })->get();
+            $gradeId = DB::table('student_class_section')
+                ->join('class_sections', 'student_class_section.class_section_id', '=', 'class_sections.id')
+                ->where('student_class_section.user_id', $user->id)
+                ->whereNull('student_class_section.deleted_at')
+                ->value('class_sections.grade_id');
+            $materials = Material::with('grade')
+                ->where('grade_id', $gradeId)
+                ->get();
+
         }
         //  $materials = Material::all();
-         return view('materials.index', compact('materials'));
+         return view('materials.index', compact('materials','role'));
      }
      
      public function create()

@@ -14,11 +14,13 @@
                 {{ __('messages.teacher_assignments') }}
             </h3>
         </div>
+        @if ($role == 'super_admin' || $role == 'school_manager')
         <div class="col-auto">
             <a href="{{ route('materials.create', $classSection->id) }}" class="btn btn-primary">
                 <i class="feather-edit"></i> {{ __('messages.create_material') }}
             </a>
         </div>
+        @endif
     </div>
 
     <!-- Teacher Assignments Table -->
@@ -38,7 +40,9 @@
                                 <th>{{ __('messages.academic_year') }}</th>
                                 <th>{{ __('messages.term') }}</th>
                                 <th>{{ __('messages.class_section') }}</th>
-                                <th class="text-end">{{ __('messages.actions') }}</th>
+                                @if ($role == 'super_admin' || $role == 'school_manager')
+                                    <th class="text-end">{{ __('messages.actions') }}</th>
+                                @endif
                             </tr>
                             <tr>
                                 <th>
@@ -56,7 +60,9 @@
                                 <th>
                                     <input type="text" id="classSectionSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}">
                                 </th>
-                                <th></th>
+                                @if ($role == 'super_admin' || $role == 'school_manager')
+                                    <th></th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -67,6 +73,7 @@
                                     <td>{{ $assignments[$material->id]->academicYear->name ?? __('messages.not_assigned') }}</td>
                                     <td>{{ $assignments[$material->id]->term->name ?? __('messages.not_assigned') }}</td>
                                     <td>{{ $assignments[$material->id]->classSection->name ?? __('messages.not_assigned') }}</td>
+                                    @if ($role == 'super_admin' || $role == 'school_manager')
                                     <td class="text-end">
                                         @if(isset($assignments[$material->id]))
                                             <a href="{{ route('material-assignment.edit', [ $assignments[$material->id] ]) }}" class="btn btn-primary btn-sm">
@@ -85,6 +92,7 @@
                                             </a>
                                         @endif
                                     </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>

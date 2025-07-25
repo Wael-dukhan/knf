@@ -28,6 +28,7 @@ use App\Http\Controllers\QuranLevelController;
 use App\Http\Controllers\QuranClassesController;
 use App\Http\Controllers\QuranTeacherAttendanceController;
 use App\Http\Controllers\QuranStudentAttendanceController;
+use App\Http\Controllers\ParentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,7 +74,7 @@ Route::middleware('guest')->group(function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
-Route::resource('materials', MaterialController::class)->middleware(['auth','role:super_admin|school_manager|teacher']);
+Route::resource('materials', MaterialController::class)->middleware(['auth','role:super_admin|school_manager|teacher|student']);
 
 Route::get('/material-assignments', [MaterialTeacherAssignmentController::class, 'index'])->name('material-assignments.index');
 Route::get('/class-sections/{id}/material-assignments', [MaterialTeacherAssignmentController::class, 'show'])->name('material-assignments.show');
@@ -84,6 +85,9 @@ Route::put('/material-assignments/{assignmentId}', [MaterialTeacherAssignmentCon
 Route::delete('/material-assignments/{assignment}', [MaterialTeacherAssignmentController::class, 'destroy'])
     ->name('material-assignments.destroy');
 
+Route::prefix('parent')->middleware(['auth', 'role:parent'])->group(function () {
+    Route::get('/children', [ParentController::class, 'childrenIndex'])->name('parent.children.index');
+});
 
 // عرض النموذج لتعيين طالب لشعبة
 Route::get('/grades/{gradeId}/assign-student', [StudentClassSectionController::class, 'create'])->name('student.assign.create');
@@ -116,7 +120,7 @@ Route::prefix('students')->name('students.')->group(function () {
 
 Route::resource('users', UserController::class)->middleware(['auth', 'role:super_admin|school_manager']);
 
-Route::middleware(['auth', 'role:super_admin|school_manager|quran_supervisor'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:super_admin|school_manager|quran_supervisor|quran_teacher'])->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserManagementController::class, 'create'])->name('users.create');
@@ -215,7 +219,7 @@ Route::get('/schools/{schoolId}/quran-levels', [App\Http\Controllers\QuranLevelC
 Route::get('/schools/{schoolId}/quran-levels/json', [App\Http\Controllers\QuranLevelController::class, 'getJsonQuranLevelsBySchool'])
     ->name('schools.quran-levels.json');
 
-Route::prefix('quran-classes')->group(function () {
+Route::middleware(['auth', 'role:super_admin|quran_supervisor'])->prefix('quran-classes')->group(function () {
 
     // عرض نموذج اختيار الطلاب لتعيينهم لحلقة قرآنية (GET)
     Route::get('{quranClass}/assign-students', [QuranClassesController::class, 'assignStudentsForm'])
@@ -226,6 +230,7 @@ Route::prefix('quran-classes')->group(function () {
         ->name('quranClass.assign_students.store');
 
 });
+
 
 
 Route::prefix('quran-teacher-attendance')->middleware(['auth'])->group(function () {

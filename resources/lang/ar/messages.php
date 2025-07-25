@@ -293,5 +293,9 @@ return [
     'my_quran_classes' => 'حلقاتي القرأنية',
     'no_levels_found_for_teacher' => 'لا يوجد مستويات قرآنية لهذا المعلم',
     'no_classes_for_level' => 'لا يوجد حلقات في هذا المستوى',
+    'quran_sessions' => 'حلقات القرآن',
+    'my_profile' => 'الملف الشخصي',
+    'my_children' => 'أبنائي',
+    'children_list' => 'قائمة الأبناء',
     
 ];

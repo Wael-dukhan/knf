@@ -78,6 +78,34 @@ class User extends Authenticatable
         return $this->belongsToMany(User::class, 'parent_student', 'student_id', 'parent_id');
     }
 
+    public function children()
+    {
+        return $this->belongsToMany(User::class, 'parent_student', 'parent_id', 'student_id');
+    }
+
+    // الشعبة الحالية فقط (مثلاً بناءً على العام الدراسي الحالي)
+    public function currentStudentClassSection()
+    {
+        // تحقق من أن الدور 'student' فقط
+        // if (! $this->hasRole('parent')) {
+        //     throw new \Exception("هذه الدالة خاصة بدور ولي الأمر فقط");
+        // }
+
+        $currentYearId = \App\Models\AcademicYear::value('id');
+        return $this->hasOne(\App\Models\StudentClassSection::class, 'user_id')
+                    ->where('academic_year_id', $currentYearId);
+    }
+
+    // للوصول مباشرة للصف (Grade) الخاص بالشعبة الحالية
+    public function currentGrade()
+    {
+                // تحقق من أن الدور 'student' فقط
+        // if (! $this->hasRole('parent')) {
+        //     throw new \Exception("هذه الدالة خاصة بدور ولي الأمر فقط");
+        // }
+
+        return $this->currentStudentClassSection()?->classSection?->grade;
+    }
     /**
      * علاقة المشرف بالمُعلمين الذين يشرف عليهم.
      * 
@@ -163,13 +191,13 @@ class User extends Authenticatable
         return $this->hasMany(MaterialUserTermSection::class);
     }
 
-    // public function quranClasses()
-    // {
-    //     return $this->belongsToMany(QuranClass::class, 'student_quran_classes')
-    //                 ->withTimestamps()
-    //                 ->withPivot(['status', 'joined_at', 'completed_at', 'deleted_at'])
-    //                 ->wherePivotNull('deleted_at');
-    // }
+    public function studentQuranClasses()
+    {
+        return $this->belongsToMany(QuranClass::class, 'student_quran_classes')
+                    ->withTimestamps()
+                    ->withPivot(['status', 'joined_at', 'completed_at', 'deleted_at'])
+                    ->wherePivotNull('deleted_at');
+    }
 
     
 }

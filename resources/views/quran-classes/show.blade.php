@@ -44,9 +44,11 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4 class="mb-3">{{ __('messages.students_list') }}</h4>
+                    @if ($role == 'super_admin' || $role == 'quran_supervisor')
                     <a href="{{ route('quranClass.assign_students.form', [$quranClass->id]) }}" class="btn btn-outline-primary">
                         <i class="feather-list"></i> {{ __('messages.assign_student_to_quran_classes') }}
                     </a>
+                    @endif
                 </div>
                 @if($quranClass->students->isEmpty())
                     <div class="alert alert-warning text-center">{{ __('messages.no_students_found') }}</div>
@@ -76,9 +78,11 @@
                                         <a href="{{ route('admin.users.show', $student->id) }}" class="btn btn-sm bg-info-light me-2">
                                             <i class="feather-eye"></i> {{ __('messages.view') }}
                                         </a>
-                                        <a href="{{ route('admin.users.edit', $student->id) }}" class="btn btn-sm bg-warning-light me-2">
-                                            <i class="feather-edit"></i> {{ __('messages.edit') }}
-                                        </a>
+                                        @if ($role == 'super_admin' || $role == 'quran_supervisor')
+                                            <a href="{{ route('admin.users.edit', $student->id) }}" class="btn btn-sm bg-warning-light me-2">
+                                                <i class="feather-edit"></i> {{ __('messages.edit') }}
+                                            </a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

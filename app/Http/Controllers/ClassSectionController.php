@@ -125,6 +125,10 @@ class ClassSectionController extends Controller
     {
         // تحميل الطلاب الذين ينتمون إلى الشعبة
         // $students = $class_section->users;
+        // التحقق من صلاحية المستخدم
+        $user = auth()->user(); // الحصول على المستخدم الحالي
+        // الحصول على دور المستخدم
+        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
 
         $students = DB::table('student_class_section')
             ->join('users', 'student_class_section.user_id', '=', 'users.id')
@@ -142,7 +146,7 @@ class ClassSectionController extends Controller
 
         $grade = $class_section->grade;
         // dd($class_section);
-        return view('class_sections.show', compact('class_section', 'students','grade'));
+        return view('class_sections.show', compact('class_section', 'students','grade','role'));
     }
     
 

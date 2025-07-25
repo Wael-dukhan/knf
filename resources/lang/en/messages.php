@@ -167,5 +167,10 @@ return [
     'my_classes' => 'My Class Sections',
     'my_quran_classes' => 'My Quran Classes',
     'no_levels_found_for_teacher' => 'no levels found for teacher',
-    'no_classes_for_level' => 'no classes for level'
+    'no_classes_for_level' => 'no classes for level',
+    'quran_sessions' => 'quran sessions',
+    'my_profile' => 'My Profile',
+    'my_children' => 'My Childern',
+    'children_list' => 'Children List',
+
 ];

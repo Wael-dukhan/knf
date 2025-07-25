@@ -92,7 +92,7 @@ class QuranClassesController extends Controller
         // الحصول على دور المستخدم
         $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
         // في حالة المشرف العام، يمكن عرض تفاصيل الحلقة
-        if ($role === 'super_admin') {
+        if ($role === 'super_admin' || $role === 'quran_teacher') {
             // في حالة المشرف العام، يمكن عرض تفاصيل الحلقة
             $quranClass->load('quranTeacher', 'students', 'quranLevel');
         } else if ($role === 'quran_supervisor') {
@@ -105,7 +105,7 @@ class QuranClassesController extends Controller
             return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
         }
         // dd($quranClass);
-        return view('quran-classes.show', compact('quranClass'));
+        return view('quran-classes.show', compact('quranClass','role'));
     }
 
     // صفحة تعديل حلقة
@@ -199,11 +199,10 @@ class QuranClassesController extends Controller
     {
         // جلب الطلاب الذين ينتمون لنفس المدرسة والمستوى القرآني المرتبط بالحلفة
         $schoolId = $quranClass->quranLevel->school_id;  // افتراضياً الحلقة مرتبطة بمستوى يحتوي على مدرسة
-
         // الطلاب الذين ينتمون للمدرسة، لديهم دور student، ولم يتم تعيينهم لهذه الحلقة (باستثناء soft deleted)
         $students = User::role('student')
                         ->where('school_id', $schoolId)
-                        ->whereDoesntHave('quranClasses', function($query) use ($quranClass) {
+                        ->whereDoesntHave('studentQuranClasses', function($query) use ($quranClass) {
                             $query->where('quran_class_id', $quranClass->id);
                         })
                         ->get();
@@ -230,7 +229,6 @@ class QuranClassesController extends Controller
                 ]);
             }
         }
-
         return redirect()->route('quran-classes.show', $quranClass->id)
                         ->with('success', 'Students assigned to the Quran class successfully.');
     }

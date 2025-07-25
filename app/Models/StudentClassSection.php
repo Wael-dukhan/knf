@@ -11,7 +11,7 @@ class StudentClassSection extends Model
 {
     use HasFactory;
     use SoftDeletes;
-
+    protected $table = 'student_class_section';
     protected $fillable = ['user_id', 'class_section_id','status','academic_year_id'];
 
     public function user()

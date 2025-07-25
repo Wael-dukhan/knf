@@ -30,7 +30,9 @@
                             <th>{{ __('messages.academic_year') }}</th>
                             <th>{{ __('messages.main_book') }}</th>
                             <th>{{ __('messages.activity_book') }}</th>
+                            @if ($role == 'super_admin' || $role == 'school_manager')
                             <th>{{ __('messages.actions') }}</th>
+                            @endif
                         </tr>
                         <tr>
                             <th></th>
@@ -48,7 +50,9 @@
                             </th>
                             <th></th>
                             <th></th>
+                            @if ($role == 'super_admin' || $role == 'school_manager')
                             <th></th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -74,6 +78,7 @@
                                     @endif
                                 </td>
                                 {{-- <td>{{ $material->materialUserTermSections->user->name }}</td> --}}
+                                @if ($role == 'super_admin' || $role == 'school_manager')
                                 <td>
                                     @if ($material->book_path)
                                         <a href="{{ asset('storage/' . $material->book_path) }}" target="_blank" class="btn btn-sm btn-success">
@@ -88,6 +93,7 @@
                                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{{ __('messages.confirm_delete') }}')"><i class="fa fa-trash"></i> {{ __('messages.delete') }}</button>
                                     </form>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
