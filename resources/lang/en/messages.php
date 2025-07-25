@@ -172,5 +172,7 @@ return [
     'my_profile' => 'My Profile',
     'my_children' => 'My Childern',
     'children_list' => 'Children List',
+    'no_education_history_found' => 'not found any education history',
+    'main_menu' => 'Side Bar Menu',
 
 ];

@@ -8,9 +8,11 @@
             <div class="col">
                 <h3 class="page-title">{{ __('messages.materials_list') }}</h3>
             </div>
+            @if ($role == 'super_admin' || $role == 'school_manager')
             <div class="col-auto text-end float-end ms-auto">
                 <a href="{{ route('materials.create') }}" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> {{ __('messages.create_material') }}</a>
             </div>
+            @endif
         </div>
     </div>
     <!-- Material Table -->

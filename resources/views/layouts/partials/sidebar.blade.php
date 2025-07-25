@@ -3,7 +3,7 @@
         <div id="sidebar-menu" class="sidebar-menu">
             <ul>
                 <li class="menu-title">
-                    <span>Main Menu</span>
+                    <span>{{__('messages.main_menu')}}</span>
                 </li>
                 {{-- <li class="submenu">
                     <a href="#"
@@ -379,7 +379,7 @@
                     </li>
 
                 @elseif (Auth::user()->hasRole('parent'))
-                    <li class="submenu">
+                    <li class="menu-item">
                         <a href="{{ route('profile.show') }}"
                         class="{{ request()->routeIs('student.profile') ? 'active' : '' }}">
                             {{ __('messages.my_profile') }}
@@ -393,7 +393,7 @@
                     </li>
 
                 @elseif (Auth::user()->hasRole('student'))
-                    <li class="submenu">
+                    <li class="menu-item">
                         <a href="{{ route('profile.show') }}"
                         class="{{ request()->routeIs('student.profile') ? 'active' : '' }}">
                             {{ __('messages.my_profile') }}

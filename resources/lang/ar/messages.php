@@ -297,5 +297,7 @@ return [
     'my_profile' => 'الملف الشخصي',
     'my_children' => 'أبنائي',
     'children_list' => 'قائمة الأبناء',
+    'no_education_history_found' => 'لا يوجد أي سجل تعليمي',
+    'main_menu' => 'القائمة الجانبية',
     
 ];
