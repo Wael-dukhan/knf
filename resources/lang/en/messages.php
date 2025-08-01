@@ -189,5 +189,6 @@ return [
         'first_term_total' => 'First Term Total',
         'submit_button' => 'Submit Marks',
         'success_message' => 'Marks saved successfully.',
+        'entry_button' => 'Entry button',
     ],
 ];
