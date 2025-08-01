@@ -29,6 +29,7 @@ use App\Http\Controllers\QuranClassesController;
 use App\Http\Controllers\QuranTeacherAttendanceController;
 use App\Http\Controllers\QuranStudentAttendanceController;
 use App\Http\Controllers\ParentController;
+use App\Http\Controllers\MarkEntryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -261,3 +262,6 @@ Route::prefix('quran-teacher')->middleware(['auth', 'role:quran_teacher'])->name
 
 });
 
+// تمرير المادة والشعبة (مثلاً المادة ID = 5، الشعبة ID = 2)
+Route::get('/marks/create/{material}/{section}', [MarkEntryController::class, 'create'])->name('marks.create');
+Route::post('/marks/store', [MarkEntryController::class, 'store'])->name('marks.store');

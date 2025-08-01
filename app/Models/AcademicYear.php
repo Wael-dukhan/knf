@@ -9,7 +9,7 @@ class AcademicYear extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'school_id', 'start_date', 'end_date'];
+    protected $fillable = ['name', 'school_id', 'start_date', 'end_date','status'];
 
     public function grades()
     {

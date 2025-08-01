@@ -5,6 +5,7 @@ use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Grade;
 
 class AcademicYearController extends Controller
 {
@@ -47,10 +48,35 @@ class AcademicYearController extends Controller
         return view('academic_years.create', compact('schools'));
     }
     
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         // 'name' => 'required|unique:academic_years,name|max:20',
+    //         'name' => [
+    //             'required',
+    //             'max:20',
+    //             Rule::unique('academic_years')->where(function ($query) use ($request) {
+    //                 return $query->where('school_id', $request->school_id);
+    //             }),
+    //         ],
+    //         'school_id' => 'required|exists:schools,id',
+    //         'start_date' => 'required|date',
+    //         'end_date' => 'required|date|after_or_equal:start_date',
+    //     ]);
+    
+    //     AcademicYear::create([
+    //         'name' => $request->name,
+    //         'school_id' => $request->school_id,
+    //         'start_date' => $request->start_date,
+    //         'end_date' => $request->end_date,
+    //     ]);
+    
+    //     return redirect()->route('admin.academic_years.index')->with('success', 'تمت إضافة السنة الدراسية بنجاح');
+    // }
+
     public function store(Request $request)
     {
         $request->validate([
-            // 'name' => 'required|unique:academic_years,name|max:20',
             'name' => [
                 'required',
                 'max:20',
@@ -61,18 +87,80 @@ class AcademicYearController extends Controller
             'school_id' => 'required|exists:schools,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'status' => 'required|in:active,inactive',
         ]);
-    
-        AcademicYear::create([
+
+        // إنشاء السنة الدراسية
+        $academicYear = AcademicYear::create([
             'name' => $request->name,
             'school_id' => $request->school_id,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
+            'status' => $request->status,
         ]);
-    
-        return redirect()->route('admin.academic_years.index')->with('success', 'تمت إضافة السنة الدراسية بنجاح');
+
+        // الصفوف الدراسية مع أسمائها
+        $grades = [
+            1 => 'الصف الأول',
+            2 => 'الصف الثاني',
+            3 => 'الصف الثالث',
+            4 => 'الصف الرابع',
+            5 => 'الصف الخامس',
+            6 => 'الصف السادس',
+            7 => 'الصف السابع',
+            8 => 'الصف الثامن',
+            9 => 'الصف التاسع',
+            10 => 'الصف العاشر',
+            11 => 'الصف الحادي عشر',
+            12 => 'البكالوريا',
+        ];
+
+        foreach ($grades as $number => $name) {
+            $gradeLevel = $this->determineGradeLevel($number);
+
+            if ($gradeLevel === 3) {
+                // ثانوي: أنشئ علمي وأدبي
+                foreach (['science' => 'علمي', 'literary' => 'أدبي'] as $trackKey => $trackLabel) {
+                    Grade::create([
+                        'name' => $name . ' - ' . $trackLabel,
+                        'grade_number' => $number,
+                        'description' => 'وصف ' . $name . ' - ' . $trackLabel,
+                        'school_id' => $request->school_id,
+                        'academic_year_id' => $academicYear->id,
+                        'grade_level' => $gradeLevel,
+                        'track' => $trackKey,
+                    ]);
+                }
+            } else {
+                
+                // ابتدائي أو إعدادي
+                Grade::create([
+                    'name' => $name,
+                    'grade_number' => $number,
+                    'description' => 'وصف ' . $name,
+                    'school_id' => $request->school_id,
+                    'academic_year_id' => $academicYear->id,
+                    'grade_level' => $gradeLevel,
+                    'track' => null,
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.academic_years.index')->with('success', 'تمت إضافة السنة الدراسية وجميع الصفوف بنجاح.');
     }
-    
+
+    // دالة تحديد المرحلة بناءً على رقم الصف
+    private function determineGradeLevel($gradeNumber)
+    {
+        if ($gradeNumber >= 1 && $gradeNumber <= 4) {
+            return 1; // ابتدائي
+        } elseif ($gradeNumber >= 5 && $gradeNumber <= 9) {
+            return 2; // إعدادي
+        } else {
+            return 3; // ثانوي
+        }
+    }
+
     public function edit(AcademicYear $academic_year)
     {
         $user = Auth::user(); // الحصول على المستخدم الحالي
@@ -92,19 +180,62 @@ class AcademicYearController extends Controller
     }
     
 
+    // public function update(Request $request, AcademicYear $academic_year)
+    // {
+    //     $request->validate([
+    //         'name' => 'required|max:20|unique:academic_years,name,' . $academic_year->id,
+    //         'school_id' => 'required|exists:schools,id',
+    //         'start_date' => 'required|date',
+    //         'end_date' => 'required|date|after_or_equal:start_date',
+    //     ]);
+    
+    //     $academic_year->update($request->only(['name', 'school_id', 'start_date', 'end_date']));
+    
+    //     return redirect()->route('admin.academic_years.index')->with('success', 'تم التحديث بنجاح');
+    // }
+
     public function update(Request $request, AcademicYear $academic_year)
     {
         $request->validate([
-            'name' => 'required|max:20|unique:academic_years,name,' . $academic_year->id,
+            'name' => [
+                'required',
+                'max:20',
+                Rule::unique('academic_years', 'name')->ignore($academic_year->id)->where(function ($query) use ($request) {
+                    return $query->where('school_id', $request->school_id);
+                }),
+            ],
             'school_id' => 'required|exists:schools,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'status' => ['required', Rule::in(['active', 'inactive'])],
         ]);
-    
-        $academic_year->update($request->only(['name', 'school_id', 'start_date', 'end_date']));
-    
-        return redirect()->route('admin.academic_years.index')->with('success', 'تم التحديث بنجاح');
+
+        // منع وجود أكثر من سنة دراسية نشطة لنفس المدرسة (باستثناء هذه السنة نفسها)
+        if ($request->status === 'active') {
+            $existsActive = AcademicYear::where('school_id', $request->school_id)
+                ->where('status', 'active')
+                ->where('id', '!=', $academic_year->id)
+                ->exists();
+
+            if ($existsActive) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['status' => 'هناك سنة دراسية نشطة أخرى لهذه المدرسة.']);
+            }
+        }
+
+        // التحديث
+        $academic_year->update([
+            'name' => $request->name,
+            'school_id' => $request->school_id,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('admin.academic_years.index')->with('success', 'تم التحديث بنجاح.');
     }
+
     
     public function destroy(AcademicYear $academic_year)
     {

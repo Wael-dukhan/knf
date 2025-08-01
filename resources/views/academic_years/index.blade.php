@@ -51,25 +51,18 @@
                                 <th>
                                     {{ __('messages.end_date') }} <br>
                                 </th>
+                                <th>{{ __('messages.status') }}</th>
                                 <th>{{ __('messages.actions') }}</th>
                             </tr>
                             <tr>
-                                <th>
-                                    <input type="text" class="column_search form-control form-control-sm mt-1" data-column="1" placeholder="{{ __('messages.search') }}">
-                                </th>
-                                <th>
-                                    <input type="text" class="column_search form-control form-control-sm mt-1" data-column="2" placeholder="{{ __('messages.search') }}">
-                                </th>
-                                <th>
-                                    <input type="text" class="column_search form-control form-control-sm mt-1" data-column="3" placeholder="{{ __('messages.search') }}">
-                                </th>
-                                <th>
-                                    <input type="text" class="column_search form-control form-control-sm mt-1" data-column="4" placeholder="{{ __('messages.search') }}">
-                                </th>
-                                <th>
-                                    <input type="text" class="column_search form-control form-control-sm mt-1" data-column="5" placeholder="{{ __('messages.search') }}">
-                                </th>
+                                <th><input data-column="0" class="column_search form-control form-control-sm mt-1" placeholder="{{ __('messages.search') }}"></th>
+                                <th><input data-column="1" class="column_search form-control form-control-sm mt-1" placeholder="{{ __('messages.search') }}"></th>
+                                <th><input data-column="2" class="column_search form-control form-control-sm mt-1" placeholder="{{ __('messages.search') }}"></th>
+                                <th><input data-column="3" class="column_search form-control form-control-sm mt-1" placeholder="{{ __('messages.search') }}"></th>
+                                <th><input data-column="4" class="column_search form-control form-control-sm mt-1" placeholder="{{ __('messages.search') }}"></th>
+                                <th><input data-column="5" class="column_search form-control form-control-sm mt-1" placeholder="{{ __('messages.search') }}"></th>
                                 <th></th>
+                            </tr>
                         </thead>
                         <tbody>
                             @foreach($academicYears as $index => $year)
@@ -79,6 +72,7 @@
                                     <td>{{ $year->name }}</td>
                                     <td>{{ $year->start_date ? \Carbon\Carbon::parse($year->start_date)->format('Y-m-d') : '-' }}</td>
                                     <td>{{ $year->end_date ? \Carbon\Carbon::parse($year->end_date)->format('Y-m-d') : '-' }}</td>
+                                    <td>{{ __('messages.'.$year->status) }}</td>
                                     <td>
                                         <a href="{{ route('admin.academic_years.edit', $year->id) }}" class="btn btn-warning btn-sm me-1">
                                             <i class="feather-edit"></i> {{ __('messages.edit') }}
@@ -108,6 +102,8 @@
             var table = $('#academicYearsTable').DataTable({
                 dom: 'Bfrtip',
                 order: [[0, 'asc']],
+                orderCellsTop: true,
+                fixedHeader: true,
                 buttons: [
                     {
                         extend: 'excelHtml5',
@@ -128,7 +124,8 @@
 
                             $(win.document.body).find('table th:last-child, table td:last-child').css('display', 'none');
                         }
-                    }
+                    },
+                    
                 ],
                 language: {
                     search: "{{ __('messages.search') }}",
@@ -145,7 +142,17 @@
             $('input.column_search').on('keyup change clear', function () {
                 var columnIndex = $(this).data('column');
                 table.column(columnIndex).search(this.value).draw();
+                console.log(columnIndex);
             });
+            // $('#school_search').on('keyup', function () {
+            //     table.column(2).search(this.value).draw();
+            // });
+            // $('#academic_year_search').on('keyup', function () {
+            //     table.column(3).search(this.value).draw();
+            // });
+            // // $('#academicYearSearch').on('keyup', function () {
+            // //     table.column(4).search(this.value).draw();
+            // // });
         });
     </script>
 @endpush

@@ -59,6 +59,21 @@
                     <input type="date" name="end_date" id="end_date" value="{{ old('end_date') }}" class="form-control" required>
                 </div>
 
+                <div class="mb-3">
+                    <label for="status" class="form-label">
+                        {{ __('messages.status') }} <span class="text-danger">*</span>
+                    </label>
+                    <select name="status" id="status" class="form-select" required>
+                        <option value="">{{ __('messages.select_status') }}</option>
+                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>
+                            {{ __('messages.active') }}
+                        </option>
+                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>
+                            {{ __('messages.inactive') }}
+                        </option>
+                    </select>
+                </div>
+
                 <div class="d-flex justify-content-between">
                     <a href="javascript:history.back()" class="btn btn-secondary">
                         <i class="feather-arrow-left"></i> {{ __('messages.back') }}

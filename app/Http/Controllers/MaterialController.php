@@ -58,16 +58,17 @@ class MaterialController extends Controller
         $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
         // في حالة المشرف العام، يمكن عرض جميع الصفوف
         if ($role === 'super_admin') {
-            $grades = Grade::all();
+            $grades = Grade::with(['school','academicYear'])->get();
         } else if ($role === 'school_manager') {
             // في حالة مدير المدرسة، يمكن عرض الصفوف الخاصة بالمدرسة التي يديرها
-            $grades = Grade::where('school_id', $user->school_id)->get();
+            $grades = Grade::where('school_id', $user->school_id)->with(['school','academicYear'])->get();
         } else {
             return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
         }
         // $grades = Grade::all(); // في دالة create()
         // $teachers = User::role('teacher')->get(); // يجلب كل المستخدمين الذين لديهم دور "teacher"
-        
+        // dd($grades->first()->academicYear->name);
+
          return view('materials.create', compact('grades'));
      }
      

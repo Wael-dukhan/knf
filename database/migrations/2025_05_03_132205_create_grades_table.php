@@ -14,12 +14,13 @@ return new class extends Migration
         Schema::create('grades', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // اسم الصف
+            $table->unsignedTinyInteger('grade_number'); // رقم الصف من 1 إلى 12
             $table->enum('grade_level', [1, 2, 3]); 
             $table->text('description')->nullable(); // وصف اختياري
+            $table->enum('track', ['science', 'literary'])->nullable();
             $table->foreignId('academic_year_id')->constrained()->onDelete('cascade');
             $table->foreignId('school_id')->constrained()->onDelete('cascade');  // foreign key 
             $table->softDeletes(); // هذا يضيف عمود deleted_at
-
             $table->timestamps(); // created_at و updated_at
             // إضافة قيود على العمود school_id
         });

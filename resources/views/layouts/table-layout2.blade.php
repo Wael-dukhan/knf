@@ -75,6 +75,9 @@
         html[dir="ltr"] .ms-auto {
             margin-left: initial !important;
         }
+        html[dir="rtl"] .user-menu .dropdown-menu.show{
+            transform: translate3d(120px, 40px, 0px) !important;
+        }
         nav.navbar.navbar-expand-lg.navbar-light.bg-white.shadow-sm .container {
             column-gap: 10px;
         }

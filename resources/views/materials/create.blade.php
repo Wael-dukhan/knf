@@ -36,14 +36,15 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-
                     <div class="form-group">
                         <label for="grade_id">{{ __('messages.select_grade') }} <span class="text-danger">*</span></label>
                         <select id="grade_id" name="grade_id" class="form-control @error('grade_id') is-invalid @enderror" required>
                             <option value="">{{ __('messages.select_grade') }}</option>
                             @foreach($grades as $grade)
                                 <option value="{{ $grade->id }}" {{ old('grade_id') == $grade->id ? 'selected' : '' }}>
-                                    {{ $grade->school->name }} - {{ $grade->name }} - {{ $grade->academicYear->name }}
+                                    {{ $grade->school->name }}
+                                    - {{ $grade->name }}
+                                    - {{ $grade->academicYear->name ?? '' }}
                                 </option>
                             @endforeach
                         </select>

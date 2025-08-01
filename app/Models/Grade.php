@@ -11,7 +11,7 @@ class Grade extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $fillable = ['name','school_id', 'academic_year_id','description','grade_level'];
+    protected $fillable = ['name','school_id', 'academic_year_id','description','grade_level','grade_number'];
 
         protected $casts = [
         'grade_level' => 'integer',

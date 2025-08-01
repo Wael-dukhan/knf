@@ -86,12 +86,19 @@
                                                     <i class="feather-trash"></i> {{ __('messages.delete') }}
                                                 </button>
                                             </form>
+                                            <a href="{{ route('marks.create', ['material' => $material->id, 'section' => $classSection->id]) }}" class="btn btn-primary">
+                                                {{ __('messages.marks.entry_button') }}
+                                            </a>
                                         @else
                                             <a href="{{ route('material-assignment.create', ['classSectionId' => $classSection->id, 'materialId' => $material->id]) }}" class="btn btn-success btn-sm">
                                                 <i class="feather-plus"></i> {{ __('messages.assign') }}
                                             </a>
                                         @endif
                                     </td>
+                                    @elseif ($role == 'teacher')
+                                        <a href="{{ route('marks.create', ['material' => $material->id, 'section' => $classSection->id]) }}" class="btn btn-primary">
+                                            {{ __('messages.marks.entry_button') }}
+                                        </a>
                                     @endif
                                 </tr>
                             @endforeach

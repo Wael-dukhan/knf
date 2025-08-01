@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RolesAndPermissionsSeeder::class);
         
         
-        $this->call(SchoolSeeder::class);
+        // $this->call(SchoolSeeder::class);
         
         $this->call(AcademicYearSeeder::class);
 
@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
 
 
         // الصفوف الدراسية
-        $this->call(GradeSeeder::class);
+        // $this->call(GradeSeeder::class);
 
         // الشعب الدراسية
         $this->call(ClassSectionSeeder::class);

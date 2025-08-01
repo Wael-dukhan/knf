@@ -174,5 +174,20 @@ return [
     'children_list' => 'Children List',
     'no_education_history_found' => 'not found any education history',
     'main_menu' => 'Side Bar Menu',
-
+    'status' => 'Academic Year Status',
+    'select_status' => 'Select status',
+    'active' => 'Active',
+    'inactive' => 'Inactive',
+    'marks' => [
+        'entry_form_title' => 'Marks Entry for :material',
+        'student_name' => 'Student Name',
+        'oral_mark' => 'Oral Mark',
+        'homework_mark' => 'Homework Mark',
+        'study_mark' => 'Study Mark',
+        'work_total' => 'Work Total',
+        'first_term_exam' => 'First Term Exam',
+        'first_term_total' => 'First Term Total',
+        'submit_button' => 'Submit Marks',
+        'success_message' => 'Marks saved successfully.',
+    ],
 ];
