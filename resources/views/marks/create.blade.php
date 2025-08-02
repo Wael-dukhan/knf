@@ -4,8 +4,14 @@
 
 @section('content')
 <div class="page-wrapper">
-    <div class="container mt-5 card shadow-sm p-4 mb-4">
+    <div class="container-fluid mt-5 card shadow-sm p-4 mb-4">
         <h2 class="mb-4">{{ __('messages.marks.entry_form_title', ['material' => $material->name]) }}</h2>
+        <div class="mb-3">
+            <strong>{{ __('messages.school') }}:</strong> {{ $classSectionInfo->school_name }} - 
+            <strong>{{ __('messages.grade') }}:</strong> {{ $classSectionInfo->grade_name }}<br>
+            <strong>{{ __('messages.academic_year') }}:</strong> {{ $classSectionInfo->academic_year_name }} - 
+            <strong>{{ __('messages.term') }}:</strong> {{ $termName }}
+        </div>
 
         @if(session('success'))
             <div class="alert alert-success">{{ __('messages.marks.success_message') }}</div>
@@ -24,15 +30,17 @@
             @endif
             <input type="hidden" name="material_id" value="{{ $material->id }}">
 
-            <table class="table table-bordered">
+            <table id="marksTable" class="table table-bordered">
                 <thead>
                     <tr>
                         <th>{{ __('messages.marks.student_name') }}</th>
                         <th>{{ __('messages.marks.oral_mark') }}</th>
                         <th>{{ __('messages.marks.homework_mark') }}</th>
-                        <th>{{ __('messages.marks.study_mark') }}</th>
+                        <th>{{ __('messages.marks.first_study') }}</th>
+                        <th>{{ __('messages.marks.second_study') }}</th>
                         <th>{{ __('messages.marks.work_total') }}</th>
-                        <th>{{ __('messages.marks.first_term_exam') }}</th>
+                        <th>{{ __('messages.marks.oral_exam') }}</th>
+                        <th>{{ __('messages.marks.written_exam') }}</th>
                         <th>{{ __('messages.marks.first_term_total') }}</th>
                     </tr>
                 </thead>
@@ -41,19 +49,43 @@
                     <tr>
                         <td>{{ $student->name }}</td>
                         <td>
-                            <input type="number" name="marks[{{ $student->id }}][oral]" class="form-control mark-input" min="0" max="100" step="0.01" value="0" required>
+                            <input type="number" name="marks[{{ $student->id }}][oral]" class="form-control mark-input"
+                                   min="0" max="100" step="0.01"
+                                   value="{{ old('marks.'.$student->id.'.oral', $existingMarks[$student->id]->oral_mark ?? 0) }}"
+                                   required>
                         </td>
                         <td>
-                            <input type="number" name="marks[{{ $student->id }}][homework]" class="form-control mark-input" min="0" max="100" step="0.01" value="0" required>
+                            <input type="number" name="marks[{{ $student->id }}][homework]" class="form-control mark-input"
+                                   min="0" max="100" step="0.01"
+                                   value="{{ old('marks.'.$student->id.'.homework', $existingMarks[$student->id]->homework_mark ?? 0) }}"
+                                   required>
                         </td>
                         <td>
-                            <input type="number" name="marks[{{ $student->id }}][study]" class="form-control mark-input" min="0" max="100" step="0.01" value="0" required>
+                            <input type="number" name="marks[{{ $student->id }}][first_study]" class="form-control mark-input"
+                                   min="0" max="100" step="0.01"
+                                   value="{{ old('marks.'.$student->id.'.first_study', $existingMarks[$student->id]->first_study_mark ?? 0) }}"
+                                   required>
+                        </td>
+                        <td>
+                            <input type="number" name="marks[{{ $student->id }}][second_study]" class="form-control mark-input"
+                                   min="0" max="100" step="0.01"
+                                   value="{{ old('marks.'.$student->id.'.second_study', $existingMarks[$student->id]->second_study_mark ?? 0) }}"
+                                   required>
                         </td>
                         <td>
                             <input type="number" class="form-control work-total" readonly>
                         </td>
                         <td>
-                            <input type="number" name="marks[{{ $student->id }}][first_term_exam]" class="form-control mark-input" min="0" max="100" step="0.01" value="0" required>
+                            <input type="number" name="marks[{{ $student->id }}][oral_exam]" class="form-control mark-input"
+                                   min="0" max="100" step="0.01"
+                                   value="{{ old('marks.'.$student->id.'.oral_exam', $existingMarks[$student->id]->oral_exam_mark ?? 0) }}"
+                                   required>
+                        </td>
+                        <td>
+                            <input type="number" name="marks[{{ $student->id }}][written_exam]" class="form-control mark-input"
+                                   min="0" max="100" step="0.01"
+                                   value="{{ old('marks.'.$student->id.'.written_exam', $existingMarks[$student->id]->written_exam_mark ?? 0) }}"
+                                   required>
                         </td>
                         <td>
                             <input type="number" class="form-control first-term-total" readonly>
@@ -63,32 +95,47 @@
                 </tbody>
             </table>
 
-            <button type="submit" class="btn btn-primary">{{ __('messages.marks.submit_button') }}</button>
+            <button type="submit" class="btn btn-primary mt-2">{{ __('messages.marks.submit_button') }}</button>
         </form>
     </div>
 </div>
+@endsection
 
+@push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+$(document).ready(function() {
+    var table = $('#marksTable').DataTable({
+        orderCellsTop: true,
+        paging: true,
+        searching: true,
+        ordering: true,
+        info: true,
+        pageLength: 50,
+    });
+
     function calculateTotals(row) {
-        const oral = parseFloat(row.querySelector('input[name$="[oral]"]').value) || 0;
-        const homework = parseFloat(row.querySelector('input[name$="[homework]"]').value) || 0;
-        const study = parseFloat(row.querySelector('input[name$="[study]"]').value) || 0;
-        const firstTermExam = parseFloat(row.querySelector('input[name$="[first_term_exam]"]').value) || 0;
+        const oral = parseFloat($(row).find('input[name$="[oral]"]').val()) || 0;
+        const homework = parseFloat($(row).find('input[name$="[homework]"]').val()) || 0;
+        const firstStudy = parseFloat($(row).find('input[name$="[first_study]"]').val()) || 0;
+        const secondStudy = parseFloat($(row).find('input[name$="[second_study]"]').val()) || 0;
+        const oralExam = parseFloat($(row).find('input[name$="[oral_exam]"]').val()) || 0;
+        const writtenExam = parseFloat($(row).find('input[name$="[written_exam]"]').val()) || 0;
 
-        const workTotal = (oral + homework + study)/3;
-        const firstTermTotal = (workTotal + firstTermExam)/2;
+        const workTotal = (oral + homework + firstStudy + secondStudy) / 4;
+        const firstTermTotal = (workTotal + oralExam + writtenExam) / 3;
 
-        row.querySelector('.work-total').value = workTotal.toFixed(2);
-        row.querySelector('.first-term-total').value = firstTermTotal.toFixed(2);
+        $(row).find('.work-total').val(workTotal.toFixed(2));
+        $(row).find('.first-term-total').val(firstTermTotal.toFixed(2));
     }
 
-    document.querySelectorAll('tbody tr').forEach(row => {
-        row.querySelectorAll('.mark-input').forEach(input => {
-            input.addEventListener('input', () => calculateTotals(row));
-        });
+    $('#marksTable tbody').on('input', '.mark-input', function() {
+        var row = $(this).closest('tr');
         calculateTotals(row);
+    });
+
+    $('#marksTable tbody tr').each(function() {
+        calculateTotals(this);
     });
 });
 </script>
-@endsection
+@endpush

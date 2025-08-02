@@ -14,12 +14,15 @@ class CreateMarksTable extends Migration
             $table->foreignId('student_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('material_id')->constrained('materials')->onDelete('cascade');
             $table->foreignId('term_id')->constrained('terms')->onDelete('cascade');
-            $table->decimal('oral_mark', 5, 2)->nullable();
-            $table->decimal('homework_mark', 5, 2)->nullable();
-            $table->decimal('study_mark', 5, 2)->nullable();
-            $table->decimal('work_total', 5, 2)->nullable();
-            $table->decimal('exam_mark', 5, 2)->nullable();
-            $table->decimal('term_total', 5, 2)->nullable();
+
+            $table->decimal('oral_mark', 5, 2);           // المشاركة الشفوية (إن أردت إبقاؤه)
+            $table->decimal('homework_mark', 5, 2);
+            $table->decimal('first_study_mark', 5, 2);    // المذاكرة الأولى
+            $table->decimal('second_study_mark', 5, 2);   // المذاكرة الثانية
+            $table->decimal('work_total', 5, 2);
+            $table->decimal('oral_exam_mark', 5, 2);      // الامتحان الفصلي الشفهي
+            $table->decimal('written_exam_mark', 5, 2);   // الامتحان الفصلي التحريري
+            $table->decimal('term_total', 5, 2);
 
             $table->timestamps();
 

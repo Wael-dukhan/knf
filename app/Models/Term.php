@@ -59,4 +59,21 @@ class Term extends Model
 
         return $term?->id; // ترجع null إذا لم يوجد فصل حالي
     }
+
+    public static function currentTermName($schoolId = null)
+    {
+        $today = time();
+
+        $term = Term::where('start_date', '<=', $today)
+            ->where('end_date', '>=', $today);
+
+        if ($schoolId) {
+            $term->where('school_id', $schoolId);
+        }
+
+        $term = $term->first();
+
+        return $term ? $term->name : __('messages.section_info.no_current_term');
+    }
+
 }

@@ -62,7 +62,7 @@
                     <li class="submenu">
                         <a href="#"
                             ><i class="fas fa-clipboard"></i>
-                            <span> {{ __('messages.academic_years') }}</span>
+                            <span> {{ __('messages.the_academic_years') }}</span>
                             <span class="menu-arrow"></span
                         ></a>
                         <ul>
@@ -215,7 +215,7 @@
                     <li class="submenu">
                         <a href="#"
                             ><i class="fas fa-clipboard"></i>
-                            <span> {{ __('messages.academic_years') }}</span>
+                            <span> {{ __('messages.the_academic_years') }}</span>
                             <span class="menu-arrow"></span
                         ></a>
                         <ul>

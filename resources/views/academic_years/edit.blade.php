@@ -41,12 +41,40 @@
 
                     <div class="mb-3">
                         <label for="start_date" class="form-label">{{ __('messages.start_date') }} <span class="text-danger">*</span></label>
-                        <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $academic_year->start_date ? $academic_year->start_date : '') }}" class="form-control" required>
+                        <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $academic_year->start_date) }}" class="form-control" required>
                     </div>
 
                     <div class="mb-4">
                         <label for="end_date" class="form-label">{{ __('messages.end_date') }} <span class="text-danger">*</span></label>
-                        <input type="date" name="end_date" id="end_date" value="{{ old('end_date', $academic_year->end_date ? $academic_year->end_date : '') }}" class="form-control" required>
+                        <input type="date" name="end_date" id="end_date" value="{{ old('end_date', $academic_year->end_date) }}" class="form-control" required>
+                    </div>
+
+                    {{-- Term 1 dates --}}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="term1_start" class="form-label">{{ __('messages.term1_start') }} <span class="text-danger">*</span></label>
+                            <input type="date" name="term1_start" id="term1_start" class="form-control"
+                                value="{{ old('term1_start', $terms[0]->start_date ?? '') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="term1_end" class="form-label">{{ __('messages.term1_end') }} <span class="text-danger">*</span></label>
+                            <input type="date" name="term1_end" id="term1_end" class="form-control"
+                                value="{{ old('term1_end', $terms[0]->end_date ?? '') }}" required>
+                        </div>
+                    </div>
+
+                    {{-- Term 2 dates --}}
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="term2_start" class="form-label">{{ __('messages.term2_start') }} <span class="text-danger">*</span></label>
+                            <input type="date" name="term2_start" id="term2_start" class="form-control"
+                                value="{{ old('term2_start', $terms[1]->start_date ?? '') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="term2_end" class="form-label">{{ __('messages.term2_end') }} <span class="text-danger">*</span></label>
+                            <input type="date" name="term2_end" id="term2_end" class="form-control"
+                                value="{{ old('term2_end', $terms[1]->end_date ?? '') }}" required>
+                        </div>
                     </div>
 
                     <div class="mb-3">

@@ -47,7 +47,9 @@
                                 <th>
                                     <input type="text" id="schoolSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}">
                                 </th>
-                                <th></th>
+                                <th>
+                                    <input type="text" id="academicYearSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}">
+                                </th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -151,6 +153,10 @@
 
         $('#schoolSearch').on('keyup', function () {
             table.column(2).search(this.value).draw();
+        });
+
+        $('#academicYearSearch').on('keyup', function () {
+            table.column(3).search(this.value).draw();
         });
     });
 </script>

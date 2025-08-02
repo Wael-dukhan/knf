@@ -13,14 +13,13 @@
                 width: 100%;
                 padding: 2px 4px;
                 font-size: 12px;
+                box-sizing: border-box;
             }
         </style>
 
         <div class="card shadow-sm p-4 mb-4" style="background-color: #fff;">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">
-                    {{ __('messages.terms_list') }}
-                </h2>
+                <h2 class="mb-0">{{ __('messages.terms_list') }}</h2>
                 <a href="{{ route('admin.terms.create') }}" class="btn btn-outline-primary">
                     <i class="feather-plus"></i> {{ __('messages.create_term') }}
                 </a>
@@ -42,63 +41,43 @@
                         <thead class="table-light">
                             <tr>
                                 <th>#</th>
-                                <th>{{ __('messages.name') }} 
-                                </th>
-                                <th>{{ __('messages.academic_year') }}
-                                </th>
-                                <th>{{ __('messages.school') }}
-                                </th>
-                                <th>
-                                    {{ __('messages.start_date') }}
-                                </th>
-                                <th>
-                                    {{ __('messages.end_date') }}
-                                </th>
+                                <th>{{ __('messages.name') }}</th>
+                                <th>{{ __('messages.academic_year') }}</th>
+                                <th>{{ __('messages.school') }}</th>
+                                <th>{{ __('messages.start_date') }}</th>
+                                <th>{{ __('messages.end_date') }}</th>
                                 <th>{{ __('messages.actions') }}</th>
                             </tr>
                             <tr>
-                                <th class=" custom-width-h">
-                                    <input type="text" class="column_search" data-column="1" placeholder="{{ __('messages.search') }}">
-                                </th>
-                                <th class=" custom-width-h">
-                                    <input type="text" class="column_search" data-column="2" placeholder="{{ __('messages.search') }}">
-                                </th>
-                                <th class=" custom-width-h">
-                                    <input type="text" class="column_search" data-column="3" placeholder="{{ __('messages.search') }}">
-                                </th>
-                                <th class=" custom-width-h">
-                                    <input type="text" class="column_search" data-column="4" placeholder="{{ __('messages.search') }}">
-                                </th>
-                                <th class=" custom-width-h">
-                                    <input type="text" class="column_search" data-column="5" placeholder="{{ __('messages.search') }}">
-                                </th>
-                                <th class=" custom-width-h">
-                                    <input type="text" class="column_search" data-column="6" placeholder="{{ __('messages.search') }}">
-                                </th>
-                                <th class=" custom-width-h"></th>
+                                <th></th> <!-- لا نبحث في العمود رقم 0 (الترقيم) -->
+                                <th><input type="text" class="column_search" placeholder="{{ __('messages.search') }}" data-column="1"></th>
+                                <th><input type="text" class="column_search" placeholder="{{ __('messages.search') }}" data-column="2"></th>
+                                <th><input type="text" class="column_search" placeholder="{{ __('messages.search') }}" data-column="3"></th>
+                                <th><input type="text" class="column_search" placeholder="{{ __('messages.search') }}" data-column="4"></th>
+                                <th><input type="text" class="column_search" placeholder="{{ __('messages.search') }}" data-column="5"></th>
+                                <th></th> <!-- لا نبحث في عمود الإجراءات -->
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($terms as $index => $term)
-                                    <tr>
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>{{ $term->name }}</td>
-                                        <td>{{ $term->academicYear->name ?? '-' }}</td>
-                                        <td>{{ $term->school->name ?? '-' }}</td>
-                                        <td>{{ date('Y/m/d',$term->start_date) ?? '-' }}</td>
-                                        <td>{{ date('Y/m/d',$term->end_date) ?? '-' }}</td>
-                                        <td>
-                                            <a href="{{ route('admin.terms.edit', $term->id) }}"
-                                               class="btn btn-warning btn-sm">{{ __('messages.edit') }}</a>
-                                            <form action="{{ route('admin.terms.destroy', $term->id) }}" method="POST" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{{ __('messages.are_you_sure') }}')">
-                                                    {{ __('messages.delete') }}
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $term->name }}</td>
+                                    <td>{{ $term->academicYear->name ?? '-' }}</td>
+                                    <td>{{ $term->school->name ?? '-' }}</td>
+                                    <td>{{ date('Y/m/d', $term->start_date) ?? '-' }}</td>
+                                    <td>{{ date('Y/m/d', $term->end_date) ?? '-' }}</td>
+                                    <td>
+                                        <a href="{{ route('admin.terms.edit', $term->id) }}" class="btn btn-warning btn-sm">{{ __('messages.edit') }}</a>
+                                        <form action="{{ route('admin.terms.destroy', $term->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('{{ __('messages.are_you_sure') }}')">
+                                                {{ __('messages.delete') }}
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -109,48 +88,51 @@
 @endsection
 
 @push('scripts')
-    <script>
-        $(document).ready(function () {
-            var table = $('#termsTable').DataTable({
-                dom: 'Bfrtip',
-                order: [[0, 'asc']],
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        text: '{{ __("messages.export_excel") }}',
-                        exportOptions: {
-                            columns: ':visible:not(:last-child)'
-                        }
-                    },
-                    {
-                        extend: 'print',
-                        text: '{{ __("messages.print") }}',
-                        customize: function (win) {
-                            $(win.document.body)
-                                .css('direction', 'rtl')
-                                .css('text-align', 'right')
-                                .find('table')
-                                .addClass('table table-bordered');
-
-                            $(win.document.body).find('table th:last-child, table td:last-child').css('display', 'none');
-                        }
+<script>
+    $(document).ready(function () {
+        var table = $('#termsTable').DataTable({
+            dom: 'Bfrtip',
+            order: [[0, 'asc']],
+            orderCellsTop: true,
+            fixedHeader: true,
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: '{{ __("messages.export_excel") }}',
+                    exportOptions: {
+                        columns: ':visible:not(:last-child)'
                     }
-                ],
-                language: {
-                    search: "{{ __('messages.search') }}",
-                    lengthMenu: "{{ __('messages.show') }} _MENU_",
-                    info: "{{ __('messages.showing') }} _START_ {{ __('messages.to') }} _END_ {{ __('messages.of') }} _TOTAL_",
-                    paginate: {
-                        previous: "{{ __('messages.previous') }}",
-                        next: "{{ __('messages.next') }}"
+                },
+                {
+                    extend: 'print',
+                    text: '{{ __("messages.print") }}',
+                    customize: function (win) {
+                        $(win.document.body)
+                            .css('direction', 'rtl')
+                            .css('text-align', 'right')
+                            .find('table')
+                            .addClass('table table-bordered');
+
+                        $(win.document.body).find('table th:last-child, table td:last-child').css('display', 'none');
                     }
                 }
-            });
-
-            $('input.column_search').on('keyup', function () {
-                var columnIndex = $(this).data('column');
-                table.column(columnIndex).search(this.value).draw();
-            });
+            ],
+            language: {
+                search: "{{ __('messages.search') }}",
+                lengthMenu: "{{ __('messages.show') }} _MENU_",
+                info: "{{ __('messages.showing') }} _START_ {{ __('messages.to') }} _END_ {{ __('messages.of') }} _TOTAL_",
+                paginate: {
+                    previous: "{{ __('messages.previous') }}",
+                    next: "{{ __('messages.next') }}"
+                }
+            }
         });
-    </script>
+
+        // بحث لكل عمود عند كتابة داخل input الخاص به
+        $('input.column_search').on('keyup change clear', function () {
+            var colIndex = $(this).data('column');
+            table.column(colIndex).search(this.value).draw();
+        });
+    });
+</script>
 @endpush

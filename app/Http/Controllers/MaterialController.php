@@ -65,6 +65,7 @@ class MaterialController extends Controller
         } else {
             return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
         }
+        dd($grades);
         // $grades = Grade::all(); // في دالة create()
         // $teachers = User::role('teacher')->get(); // يجلب كل المستخدمين الذين لديهم دور "teacher"
         // dd($grades->first()->academicYear->name);

@@ -22,6 +22,10 @@ class AcademicYear extends Model
     }
 
     
+    public function terms()
+    {
+        return $this->hasMany(\App\Models\Term::class);
+    }
 
 
 }
