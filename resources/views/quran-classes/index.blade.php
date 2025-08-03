@@ -13,7 +13,7 @@
                     </div>
                     <div class="col-auto text-end float-end ms-auto">
                         <a href="{{ route('quran-classes.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> {{ __('messages.quran_classes_list') }}
+                            <i class="fas fa-plus"></i> {{ __('messages.create') }}
                         </a>
                     </div>
                 </div>

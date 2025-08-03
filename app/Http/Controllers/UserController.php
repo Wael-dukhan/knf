@@ -134,40 +134,38 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $user)
+   public function edit(User $user)
     {
-        // التحقق من صلاحية المستخدم
-        $user = auth()->user(); // الحصول على المستخدم الحالي
-        // الحصول على دور المستخدم
-        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
-        // في حالة المشرف العام، يمكن عرض جميع الأدوار والمدارس
-        if ($role === 'super_admin') {
-            // في حالة المشرف العام، يمكن عرض جميع الأدوار والمدارس
-            $roles = Role::all()->skip(1); // تخطي دور "admin"
+        $authUser = auth()->user();
+        $authRole = $authUser->getRoleNames()->first();
+
+        // تحميل العلاقات اللازمة
+        $user->load(['school', 'parents', 'roles']);
+
+        if ($authRole === 'super_admin') {
+            $roles = Role::all()->skip(1);
             $schools = School::all();
-        } else if ($role === 'school_manager') {
-            // في حالة مدير المدرسة، يمكن عرض الأدوار الخاصة بالمدرسة التي يديرها
+        } elseif ($authRole === 'school_manager') {
+            if ($user->school_id !== $authUser->school_id) {
+                return redirect()->route('users.index')->with('error', 'لا يمكنك تعديل مستخدم من مدرسة أخرى.');
+            }
+
             $roles = Role::whereNotIn('name', ['super_admin', 'school_manager'])->get();
-            $schools = School::where('id', $user->school_id)->get();
+            $schools = School::where('id', $authUser->school_id)->get();
         } else {
-            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
             return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
         }
 
-        // $roles = Role::all()->skip(1); // تخطي دور "admin"
-        // $schools = School::all(); // جلب جميع المدارس
-        $parents = User::role('parent')->get(); // استرجاع الطلاب
-        // dd($user);
-        // // إذا كان المستخدم هو مدير، تأكد من أن هناك مديرًا في نفس المدرسة
-        // if ($userRole == 'manager' && User::where('school_id', $user->school_id)
-        //     ->whereHas('roles', function ($query) {
-        //         $query->where('name', 'manager');
-        //     })->exists()) {
-        //     return redirect()->back()->withErrors(['school_id' => 'هناك مدير موجود بالفعل لهذه المدرسة.']);
-        // }
+        $parents = User::role('parent')->get();
 
-        return view('users.edit', compact('user','roles', 'schools', 'parents'));
+        // الدور الحالي للمستخدم الذي سيتم تعديله
+        $userRole = $user->getRoleNames()->first();
+        // ولي الأمر الحالي إن وجد
+        $currentParent = $user->parents->first(); // assuming only one parent
+
+        return view('users.edit', compact('user', 'roles', 'schools', 'parents', 'userRole', 'currentParent'));
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -209,43 +207,89 @@ class UserController extends Controller
         return redirect()->route('users.index');
     }
 
+    // public function showCurrentUser()
+    // {
+    //     $user = auth()->user();
+
+    //     // تحميل العلاقات مثل المدرسة وأولياء الأمور
+    //     $user->load(['school', 'parents']);
+
+    //     $educationHistoryArray = DB::select("
+    //         SELECT 
+    //             academic_years.name AS year_name,
+    //             grades.name AS grade_name,
+    //             class_sections.name AS section_name,
+    //             class_sections.id AS class_section_id,
+    //             student_class_section.status,
+    //             schools.name AS school_name 
+    //         FROM student_class_section
+    //         INNER JOIN class_sections ON student_class_section.class_section_id = class_sections.id
+    //         INNER JOIN grades ON class_sections.grade_id = grades.id
+    //         INNER JOIN academic_years ON student_class_section.academic_year_id = academic_years.id
+    //         INNER JOIN schools ON grades.school_id = schools.id
+    //         WHERE student_class_section.user_id = ?
+    //         AND student_class_section.deleted_at IS NULL
+    //         ORDER BY academic_years.start_date ASC
+    //     ", [$user->id]);
+
+    //     $educationHistory = collect($educationHistoryArray);
+
+    //     $roles = $user->getRoleNames();
+    //     $firstRole = $roles->first();
+
+    //     $parents = DB::table('parent_student')
+    //         ->join('users as parents', 'parent_student.parent_id', '=', 'parents.id')
+    //         ->where('parent_student.student_id', $user->id)
+    //         ->select('parents.id', 'parents.name', 'parents.email')
+    //         ->get();
+        
+    //     return view('admin.users.show', compact('user', 'educationHistory','firstRole' , 'parents'));
+    // }
+
     public function showCurrentUser()
     {
         $user = auth()->user();
 
-        // تحميل العلاقات مثل المدرسة وأولياء الأمور
-        $user->load(['school', 'parents']);
-
-        $educationHistoryArray = DB::select("
-            SELECT 
-                academic_years.name AS year_name,
-                grades.name AS grade_name,
-                class_sections.name AS section_name,
-                class_sections.id AS class_section_id,
-                student_class_section.status,
-                schools.name AS school_name 
-            FROM student_class_section
-            INNER JOIN class_sections ON student_class_section.class_section_id = class_sections.id
-            INNER JOIN grades ON class_sections.grade_id = grades.id
-            INNER JOIN academic_years ON student_class_section.academic_year_id = academic_years.id
-            INNER JOIN schools ON grades.school_id = schools.id
-            WHERE student_class_section.user_id = ?
-            AND student_class_section.deleted_at IS NULL
-            ORDER BY academic_years.start_date ASC
-        ", [$user->id]);
-
-        $educationHistory = collect($educationHistoryArray);
+        // تحميل المدرسة فقط (علاقة عامة)
+        $user->load('school');
 
         $roles = $user->getRoleNames();
         $firstRole = $roles->first();
 
-        $parents = DB::table('parent_student')
-            ->join('users as parents', 'parent_student.parent_id', '=', 'parents.id')
-            ->where('parent_student.student_id', $user->id)
-            ->select('parents.id', 'parents.name', 'parents.email')
-            ->get();
+        // فقط إذا كان الدور "طالب" نقوم بجلب ولي الأمر والسجل التعليمي
+        if ($firstRole === 'student') {
+            $educationHistoryArray = DB::select("
+                SELECT 
+                    academic_years.name AS year_name,
+                    grades.name AS grade_name,
+                    class_sections.name AS section_name,
+                    class_sections.id AS class_section_id,
+                    student_class_section.status,
+                    schools.name AS school_name 
+                FROM student_class_section
+                INNER JOIN class_sections ON student_class_section.class_section_id = class_sections.id
+                INNER JOIN grades ON class_sections.grade_id = grades.id
+                INNER JOIN academic_years ON student_class_section.academic_year_id = academic_years.id
+                INNER JOIN schools ON grades.school_id = schools.id
+                WHERE student_class_section.user_id = ?
+                AND student_class_section.deleted_at IS NULL
+                ORDER BY academic_years.start_date ASC
+            ", [$user->id]);
+
+            $educationHistory = collect($educationHistoryArray);
+
+            $parents = DB::table('parent_student')
+                ->join('users as parents', 'parent_student.parent_id', '=', 'parents.id')
+                ->where('parent_student.student_id', $user->id)
+                ->select('parents.id', 'parents.name', 'parents.email')
+                ->get();
+        } else {
+            // غير طالب: نضعهم كقيمة فارغة أو null
+            $educationHistory = collect();
+            $parents = collect();
+        }
         
-        return view('admin.users.show', compact('user', 'educationHistory','firstRole' , 'parents'));
+        return view('admin.users.show', compact('user', 'educationHistory', 'firstRole', 'parents'));
     }
 
 }

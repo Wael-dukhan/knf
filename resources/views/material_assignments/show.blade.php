@@ -60,7 +60,7 @@
                                 <th>
                                     <input type="text" id="classSectionSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}">
                                 </th>
-                                @if ($role == 'super_admin' || $role == 'school_manager')
+                                @if ($role == 'super_admin' || $role == 'school_manager' || $role == 'teacher')
                                     <th></th>
                                 @endif
                             </tr>
@@ -96,9 +96,11 @@
                                         @endif
                                     </td>
                                     @elseif ($role == 'teacher')
+                                    <td>
                                         <a href="{{ route('marks.create', ['material' => $material->id, 'section' => $classSection->id]) }}" class="btn btn-primary">
                                             {{ __('messages.marks.entry_button') }}
-                                        </a>
+                                        </a>   
+                                    </td>
                                     @endif
                                 </tr>
                             @endforeach

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('level_order'); // ترتيب المستوى
             $table->text('description')->nullable(); // وصف اختياري
             $table->foreignId('school_id')->constrained()->onDelete('cascade'); // المدرسة المرتبطة
-            $table->foreignId('academic_year_id')->constrained()->onDelete('cascade');
+            // $table->foreignId('academic_year_id')->constrained()->onDelete('cascade');
             $table->softDeletes(); // دعم الحذف المنطقي
             $table->timestamps(); // created_at و updated_at
         });

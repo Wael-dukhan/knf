@@ -19,11 +19,15 @@ class QuranLevelController extends Controller
         // في حالة المشرف العام، يمكن عرض جميع مستويات القرآن
         if ($role === 'super_admin') {
             // في حالة المشرف العام، يمكن عرض جميع مستويات القرآن
-            $quranLevels = QuranLevel::with(['school', 'academicYear'])->get();
+            $quranLevels = QuranLevel::with(['school'
+            // , 'academicYear'
+            ])->get();
         } else if ($role === 'quran_supervisor') {
             // في حالة مدير المدرسة، يمكن عرض مستويات القرآن الخاصة بالمدرسة التي يديرها
             $quranLevels = QuranLevel::where('school_id', $user->school_id)
-                ->with(['school', 'academicYear'])
+                ->with(['school'
+                // , 'academicYear'
+                ])
                 ->get();
         } else {
             // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
@@ -42,17 +46,19 @@ class QuranLevelController extends Controller
         if ($role === 'super_admin') {
             // في حالة المشرف العام، يمكن عرض جميع المدارس والسنة الدراسية
             $schools = School::all();
-            $academicYears = AcademicYear::all();
+            // $academicYears = AcademicYear::all();
         } else if ($role === 'quran_supervisor') {
             // في حالة مشرف القرآن، يمكن عرض المدارس الخاصة بالمدرسة التي يديرها
             $schools = School::where('id', $user->school_id)->get();
-            $academicYears = AcademicYear::where('school_id', $user->school_id)->get();
+            // $academicYears = AcademicYear::where('school_id', $user->school_id)->get();
         } else {
             // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
             return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
         }
 
-        return view('quran-levels.create', compact('schools', 'academicYears'));
+        return view('quran-levels.create', compact('schools'
+        // , 'academicYears'
+    ));
     }
 
     public function store(Request $request)
@@ -62,23 +68,23 @@ class QuranLevelController extends Controller
                 'required',
                 Rule::unique('quran_levels')->where(function ($query) use ($request) {
                     return $query->where('school_id', $request->school_id)
-                                 ->where('academic_year_id', $request->academic_year_id)
+                                //  ->where('academic_year_id', $request->academic_year_id)
                                  ->whereNull('deleted_at');
                 }),
             ],
             'level_order' => [
                 'required',
                 'integer',
-                'min:1',
+                'min:0',
                 Rule::unique('quran_levels')->where(function ($query) use ($request) {
                     return $query->where('school_id', $request->school_id)
-                                ->where('academic_year_id', $request->academic_year_id)
+                                // ->where('academic_year_id', $request->academic_year_id)
                                 ->whereNull('deleted_at');
                 }),
             ],
             'description' => 'nullable|string|max:500',
             'school_id' => 'required|exists:schools,id',
-            'academic_year_id' => 'required|exists:academic_years,id',
+            // 'academic_year_id' => 'required|exists:academic_years,id',
         ], [
             'name.unique' => 'هذا المستوى مسجل بالفعل في نفس المدرسة ونفس السنة الدراسية.',
         ]);
@@ -90,6 +96,7 @@ class QuranLevelController extends Controller
 
     public function edit(QuranLevel $quranLevel)
     {
+        // dd('ddd');
         // التحقق من صلاحية المستخدم
         $user = auth()->user(); // الحصول على المستخدم الحالي
         // الحصول على دور المستخدم  
@@ -98,44 +105,79 @@ class QuranLevelController extends Controller
         if ($role === 'super_admin') {
             // في حالة المشرف العام، يمكن عرض جميع المدارس والسنة الدراسية
             $schools = School::all();
-            $academicYears = AcademicYear::all();
+            // $academicYears = AcademicYear::all();
         } else if ($role === 'quran_supervisor') {
             // في حالة مشرف القرآن، يمكن عرض المدارس الخاصة بالمدرسة التي يديرها
             $schools = School::where('id', $user->school_id)->get();
-            $academicYears = AcademicYear::where('school_id', $user->school_id)->get();
+            // $academicYears = AcademicYear::where('school_id', $user->school_id)->get();
         } else {
             // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
             return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
         }
 
-        return view('quran-levels.edit', compact('quranLevel', 'schools', 'academicYears'));
+        return view('quran-levels.edit', compact('quranLevel', 'schools'
+        // , 'academicYears'
+    ));
     }
 
-    public function update(Request $request, QuranLevel $quranLevel)
+    // public function update(Request $request, QuranLevel $quranLevel)
+    // {
+    //     $request->validate([
+    //         'name' => [
+    //             'required',
+    //             Rule::unique('quran_levels')->where(function ($query) use ($request, $quranLevel) {
+    //                 return $query->where('school_id', $request->school_id)
+    //                              ->where('academic_year_id', $request->academic_year_id)
+    //                              ->whereNull('deleted_at')
+    //                              ->where('id', '!=', $quranLevel->id);
+    //             }),
+    //         ],
+    //         'level_order' => [
+    //             'required',
+    //             'integer',
+    //             'min:1',
+    //             Rule::unique('quran_levels')->where(function ($query) use ($request) {
+    //                 return $query->where('school_id', $request->school_id)
+    //                             ->where('academic_year_id', $request->academic_year_id)
+    //                             ->whereNull('deleted_at');
+    //             }),
+    //         ],
+    //         'description' => 'nullable|string|max:500',
+    //         'school_id' => 'required|exists:schools,id',
+    //         'academic_year_id' => 'required|exists:academic_years,id',
+    //     ]);
+
+    //     $quranLevel->update($request->all());
+
+    //     return redirect()->route('quran-levels.index')->with('success', 'تم تحديث المستوى بنجاح');
+    // }
+
+   public function update(Request $request, QuranLevel $quranLevel)
     {
         $request->validate([
             'name' => [
                 'required',
                 Rule::unique('quran_levels')->where(function ($query) use ($request, $quranLevel) {
                     return $query->where('school_id', $request->school_id)
-                                 ->where('academic_year_id', $request->academic_year_id)
-                                 ->whereNull('deleted_at')
-                                 ->where('id', '!=', $quranLevel->id);
+                                // ->where('academic_year_id', $request->academic_year_id)
+                                ->whereNull('deleted_at')
+                                ->where('id', '!=', $quranLevel->id);
                 }),
             ],
             'level_order' => [
                 'required',
                 'integer',
-                'min:1',
-                Rule::unique('quran_levels')->where(function ($query) use ($request) {
+                'min:0',
+                Rule::unique('quran_levels')->where(function ($query) use ($request, $quranLevel) {
                     return $query->where('school_id', $request->school_id)
-                                ->where('academic_year_id', $request->academic_year_id)
-                                ->whereNull('deleted_at');
+                                // ->where('academic_year_id', $request->academic_year_id)
+                                ->whereNull('deleted_at')
+                                ->where('id', '!=', $quranLevel->id);
                 }),
             ],
             'description' => 'nullable|string|max:500',
             'school_id' => 'required|exists:schools,id',
-            'academic_year_id' => 'required|exists:academic_years,id',
+            // 'academic_year_id' => 'required|exists:academic_years,id',
         ]);
 
         $quranLevel->update($request->all());
@@ -155,9 +197,12 @@ class QuranLevelController extends Controller
         $user = auth()->user(); // الحصول على المستخدم الحالي
         // الحصول على دور المستخدم
         $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
+        // dd($role);
         // في حالة المشرف العام، يمكن عرض جميع مستويات القرآن
         if ($role === 'super_admin') {
-            $quranLevel->load(['quranClasses.quranTeacher', 'academicYear']);
+            $quranLevel->load(['quranClasses.quranTeacher'
+            // , 'academicYear'
+        ]);
             // dd($quranLevel);
             // حساب عدد الطلاب في كل حلقة داخل هذا المستوى
             foreach ($quranLevel->quranClasses as $class) {
@@ -170,7 +215,9 @@ class QuranLevelController extends Controller
             if ($quranLevel->school_id !== $user->school_id) {
                 return redirect()->route('quran-levels.index')->with('error', 'ليس لديك صلاحية الوصول إلى هذا المستوى.');
             }
-            $quranLevel->load(['quranClasses.quranTeacher', 'academicYear']);
+            $quranLevel->load(['quranClasses.quranTeacher'
+            // , 'academicYear'
+        ]);
             // حساب عدد الطلاب في كل حلقة داخل هذا المستوى
             foreach ($quranLevel->quranClasses as $class) {
                 $class->loadCount(['students as student_count']);
@@ -183,13 +230,13 @@ class QuranLevelController extends Controller
         }
         
 
-        return view('quran-levels.show', compact('quranLevel', 'totalStudents'));
+        return view('quran-levels.show', compact('quranLevel', 'totalStudents','role'));
     }
 
     public function getQuranLevelsBySchool(Request $request, $schoolId)
     {
         $quranLevels = QuranLevel::where('school_id', $schoolId)
-            ->with(['academicYear'])
+            // ->with(['academicYear'])
             ->get();
         $schoolName = School::findOrFail($schoolId)->name;
 

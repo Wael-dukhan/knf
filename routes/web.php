@@ -87,6 +87,7 @@ Route::delete('/material-assignments/{assignment}', [MaterialTeacherAssignmentCo
     ->name('material-assignments.destroy');
 
 Route::prefix('parent')->middleware(['auth', 'role:parent'])->group(function () {
+    Route::get('/users/{user}', [UserManagementController::class, 'show'])->name('parent.users.show');
     Route::get('/children', [ParentController::class, 'childrenIndex'])->name('parent.children.index');
 });
 
@@ -121,7 +122,7 @@ Route::prefix('students')->name('students.')->group(function () {
 
 Route::resource('users', UserController::class)->middleware(['auth', 'role:super_admin|school_manager']);
 
-Route::middleware(['auth', 'role:super_admin|school_manager|quran_supervisor|quran_teacher'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:super_admin|school_manager|quran_supervisor|quran_teacher|teacher'])->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserManagementController::class, 'create'])->name('users.create');

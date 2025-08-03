@@ -156,7 +156,12 @@ class GradeController extends Controller
 
     public function getGradesBySchool($school_id)
     {
-        $grades = Grade::where('school_id', $school_id)->select('id', 'name')->get();
+        $grades = Grade::where('school_id', $school_id)
+        ->whereHas('academicYear', function ($query) {
+            $query->where('status', 'active');
+        })
+        ->select('id', 'name')
+        ->get();
 
         return response()->json($grades);
     }

@@ -46,7 +46,7 @@
             </div>
         @endif
 
-        <a href="{{ route('admin.schools.show', $school->id) }}" class="btn btn-secondary mt-3">
+        <a href="{{ route('admin.schools.index') }}" class="btn btn-secondary mt-3">
             <i class="feather-arrow-left"></i> {{ __('messages.back') }}
         </a>
     </div>

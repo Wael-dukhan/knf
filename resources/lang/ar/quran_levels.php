@@ -2,6 +2,7 @@
 
 return [
     'create_new'      => 'إنشاء مستوى قرآني جديد',
+    'edit_title'      => 'تعديل المستوى القرآني',
     'school'          => 'المدرسة',
     'select_school'   => 'اختر المدرسة',
     'academic_year'   => 'السنة الدراسية',

@@ -5,10 +5,6 @@
     <div class="container mt-5">
        <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">{{ __('messages.user_details') }}</h2>
-        {{-- <a href="#" onclick="history.back(); return false;" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> {{ __('messages.back') }}
-        </a> --}}
-
     </div>
 
     <div class="card shadow-sm rounded-3 mb-4">
@@ -28,9 +24,11 @@
                         <td>{{ __('messages.'.$user->gender) }}</td>
                     </tr>
                     <tr>
-                        <th>{{ __('messages.role') }}
-                        <td> {{ $firstRole ? __('messages.'.$firstRole) : __('messages.not_assigned') }}</td>
+                        <th>{{ __('messages.role') }}</th>
+                        <td>{{ $firstRole ? __('messages.'.$firstRole) : __('messages.not_assigned') }}</td>
                     </tr>
+
+                    @if($firstRole === 'student')
                     <tr>
                         <th>{{ __('messages.parents') }}</th>
                         <td>
@@ -41,6 +39,8 @@
                             @endforelse
                         </td>
                     </tr>
+                    @endif
+
                     <tr>
                         <th>{{ __('messages.created_at') }}</th>
                         <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
@@ -50,6 +50,7 @@
         </div>
     </div>
 
+    @if($firstRole === 'student')
     {{-- جدول سجل التعليم --}}
     <div class="card shadow-sm rounded-3">
         <div class="card-header">
@@ -78,7 +79,7 @@
                                 <td>{{ $record->year_name }}</td>
                                 <td>{{ $record->grade_name }}</td>
                                 <td>{{ $record->section_name }}</td>
-                                <td>{{ $record->status }}</td>
+                                <td>{{ __('messages.' . $record->status) ?? $record->status }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -86,5 +87,6 @@
             @endif
         </div>
     </div>
+    @endif
 </div>
 @endsection

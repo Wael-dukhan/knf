@@ -26,6 +26,7 @@
                             <th>{{ __('messages.email') }}</th>
                             <th>{{ __('messages.class_section') }}</th>
                             <th>{{ __('messages.grade') }}</th>
+                            <th>{{ __('messages.actions') }}</th>
                         </tr>
                         <tr>
                             <th></th>
@@ -33,6 +34,7 @@
                             <th><input type="text" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}" id="emailSearch"></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}" id="sectionSearch"></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}" id="gradeSearch"></th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,6 +45,11 @@
                                 <td>{{ $child->email }}</td>
                                 <td>{{ optional($child->currentStudentClassSection->classSection)->name ?? '' }}</td>
                                 <td>{{ optional($child->currentStudentClassSection->classSection->grade)->name }}</td>
+                                <td>
+                                    <a href="{{ route('parent.users.show', $child->id) }}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i> {{ __('messages.view') }}
+                                    </a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

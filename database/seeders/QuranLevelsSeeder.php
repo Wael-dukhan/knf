@@ -17,11 +17,11 @@ class QuranLevelsSeeder extends Seeder
             return;
         }
         // dd($school);
-        $academicYearId = $school->academicYears->first()->id ?? null;
-        if (!$academicYearId) {
-            echo "❌ المدرسة لا تحتوي على سنة دراسية. يرجى إنشاء سنة دراسية أولاً.\n";
-            return;
-        }
+        // $academicYearId = $school->academicYears->first()->id ?? null;
+        // if (!$academicYearId) {
+        //     echo "❌ المدرسة لا تحتوي على سنة دراسية. يرجى إنشاء سنة دراسية أولاً.\n";
+        //     return;
+        // }
 
         $levels = [
             [
@@ -67,7 +67,7 @@ class QuranLevelsSeeder extends Seeder
                     'name' => $level['name'],
                     'level_order' => $level['level_order'],
                     'school_id' => $school->id,
-                    'academic_year_id' => $academicYearId,
+                    // 'academic_year_id' => $academicYearId,
                 ],
                 [
                     'description' => $level['description'],

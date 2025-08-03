@@ -97,7 +97,7 @@ public function index()
         // في حالة المشرف العام، يمكن عرض جميع الطلاب وأولياء الأمور
         if ($role === 'super_admin') {
             $student = User::findOrFail($studentId); // العثور على الطالب
-            $parents = User::role('parent')->get(); 
+            $parents = User::role('parent')->where('school_id',$student->school_id)->get(); 
             $parent = User::role('parent')->findOrFail($parentId);
         } else if ($role === 'school_manager') {
             // في حالة مدير المدرسة، يمكن عرض الطلاب وأولياء الأمور الخاصين بالمدرسة التي يديرها
@@ -117,17 +117,31 @@ public function index()
     }
 
     // تحديث أولياء الأمور للطالب
-    public function update(Request $request, $studentId)
+    // public function update(Request $request, $studentId)
+    // {
+    //     $request->validate([
+    //         'parent_ids' => 'required|array',
+    //         'parent_ids.*' => 'exists:users,id', // التأكد من أن جميع الآباء موجودون
+    //     ]);
+
+    //     $student = User::findOrFail($studentId); // العثور على الطالب
+    //     $student->parents()->sync($request->parent_ids); // تحديث العلاقة بين الطالب والأولياء
+
+    //     return redirect()->route('students.parents.index')->with('success', 'Parents updated successfully.');
+    // }
+
+    public function update(Request $request, $studentId, $parentId)
     {
         $request->validate([
-            'parent_ids' => 'required|array',
-            'parent_ids.*' => 'exists:users,id', // التأكد من أن جميع الآباء موجودون
+            'parent_id' => 'required|exists:users,id',
         ]);
 
-        $student = User::findOrFail($studentId); // العثور على الطالب
-        $student->parents()->sync($request->parent_ids); // تحديث العلاقة بين الطالب والأولياء
+        $student = User::findOrFail($studentId);
 
-        return redirect()->route('students.parents.index')->with('success', 'Parents updated successfully.');
+        // استبدال ولي الأمر الحالي بالولي الأمر الجديد
+        $student->parents()->sync([$request->parent_id]);
+
+        return redirect()->route('students.parents.index')->with('success', 'تم تحديث ولي الأمر بنجاح.');
     }
 
     // حذف علاقة ولي الأمر بالطالب

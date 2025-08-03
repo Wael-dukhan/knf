@@ -75,6 +75,7 @@
             fetch('grades-by-school/' + schoolId)
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data);
                     gradeSelect.innerHTML = '<option value="">-- اختر الصف --</option>';
                     data.forEach(function (grade) {
                         let option = document.createElement('option');

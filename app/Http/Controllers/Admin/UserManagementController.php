@@ -55,7 +55,20 @@ class UserManagementController extends Controller
     public function show($id)
     {
         $user = User::with(['school', 'parents'])->findOrFail($id);
+        $currentUser = auth()->user();
+        $currentUserRole = $currentUser->getRoleNames()->first();
 
+        // إذا كان المستخدم الحالي "ولي أمر"
+        if ($currentUserRole === 'parent') {
+            $isParentOfStudent = DB::table('parent_student')
+                ->where('parent_id', $currentUser->id)
+                ->where('student_id', $id)
+                ->exists();
+
+            if (! $isParentOfStudent) {
+                abort(403);
+            }
+        }
         $educationHistoryArray = DB::select("
             SELECT 
                 academic_years.name AS year_name,

@@ -42,6 +42,31 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+            {{-- اسم الحلقة --}}
+            <div class="mb-3">
+                <label for="name" class="form-label">
+                    {{ __('quran_levels.class_name') }} <span class="text-danger">*</span>
+                </label>
+                <input type="text" name="name" id="name"
+                    class="form-control @error('name') is-invalid @enderror"
+                    value="{{ old('name') }}" required>
+                @error('name')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- الوصف --}}
+            <div class="mb-3">
+                <label for="description" class="form-label">
+                    {{ __('messages.description') }}
+                </label>
+                <textarea name="description" id="description"
+                        class="form-control @error('description') is-invalid @enderror"
+                        rows="3">{{ old('description') }}</textarea>
+                @error('description')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
             {{-- المعلم --}}
             <div class="mb-3">

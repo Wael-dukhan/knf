@@ -46,7 +46,7 @@
             </div>
 
             {{-- اختيار السنة الدراسية --}}
-            <div class="mb-3">
+            {{-- <div class="mb-3">
                 <label for="academic_year_id" class="form-label">
                     {{ __('quran_levels.academic_year') }} <span class="text-danger">*</span>
                 </label>
@@ -70,7 +70,7 @@
                 @error('academic_year_id')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
-            </div>
+            </div> --}}
 
             {{-- اسم المستوى --}}
             <div class="mb-3">

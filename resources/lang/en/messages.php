@@ -178,6 +178,7 @@ return [
     'select_status' => 'Select status',
     'active' => 'Active',
     'inactive' => 'Inactive',
+    'no_children' => 'No Childern',
     'marks' => [
         'entry_form_title' => 'Marks Entry for :material',
         'student_name' => 'Student Name',

@@ -72,6 +72,7 @@ class QuranClassesController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
             'quran_level_id' => 'required|exists:quran_levels,id',
             'teacher_id' => 'required|exists:users,id', // Assuming teachers are users
         ]);
@@ -140,15 +141,17 @@ class QuranClassesController extends Controller
     // تحديث بيانات حلقة
     public function update(Request $request, QuranClass $quranClass)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'quran_level_id' => 'required|exists:quran_levels,id',
             'teacher_id' => 'nullable|exists:users,id',
+            'description' => 'nullable|string|max:1000',
         ]);
-        // dd($request->all());
-        $quranClass->update($request->all());
 
-        return redirect()->route('quran-levels.show' , $quranClass->quranLevel->id)->with('success', 'Quran class updated successfully.');
+        $quranClass->update($validatedData);
+
+        return redirect()->route('quran-levels.show' , $quranClass->quranLevel->id)->with('success', 'تم تحديث بيانات الحلقة بنجاح');
+;
     }
 
     // حذف حلقة

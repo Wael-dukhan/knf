@@ -39,8 +39,15 @@
 
 
         <div class="card shadow-sm p-4 mb-4">
-            <h4>{{ __('quran_levels.quran_classes') }}</h4>
+            <div class="d-flex justify-content-between">
+                            <h4>{{ __('quran_levels.quran_classes') }}</h4>
 
+            <div class="mb-2">
+                <a href="{{ route('quran-classes.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> {{ __('messages.create') }}
+                </a>
+            </div>
+            </div>
             @if($quranLevel->quranClasses->isEmpty())
                 <div class="alert alert-info">{{ __('quran_levels.no_classes') }}</div>
             @else
@@ -92,12 +99,12 @@
         </div>
 
         <div class="d-flex justify-content-between">
-            @if (auth()->user()->getRoleNames()[0] == 'super_admin')
-                <a href="{{ route('schools.quran-levels',$quranLevel->school->id) }}" class="btn btn-secondary">
+            @if ($role == 'super_admin')
+                <a href="{{ route('quran-levels.index') }}" class="btn btn-secondary">
                     <i class="feather-arrow-left"></i> {{ __('quran_levels.back') }}
                 </a>
             @else
-                <a href="{{ route('quran-levels.index') }}" class="btn btn-secondary">
+                <a href="{{ route('schools.quran-levels',$quranLevel->school->id) }}" class="btn btn-secondary">
                     <i class="feather-arrow-left"></i> {{ __('quran_levels.back') }}
                 </a>
             @endif

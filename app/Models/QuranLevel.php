@@ -15,13 +15,15 @@ class QuranLevel extends Model
         'level_order',
         'description',
         'school_id',
-        'academic_year_id',
+        // 'academic_year_id',
     ];
 
     protected $casts = [
         'level_order' => 'integer',
     ];
-    protected $with = ['school', 'academicYear']; // إن كنت تريد تحميل العلاقات افتراضياً
+    protected $with = ['school',
+    //  'academicYear'
+    ]; // إن كنت تريد تحميل العلاقات افتراضياً
 
     /**
      * علاقة المستوى بالمدرسة
@@ -42,10 +44,10 @@ class QuranLevel extends Model
     /**
      * علاقة المستوى بالسنة الدراسية
      */
-    public function academicYear()
-    {
-        return $this->belongsTo(AcademicYear::class);
-    }
+    // public function academicYear()
+    // {
+    //     return $this->belongsTo(AcademicYear::class);
+    // }
     
    
 }

@@ -51,11 +51,11 @@ class StudentClassSectionController extends Controller
         // نفترض أنه مسجل في شعبة واحدة فقط
         $currentClassSection = $student->classSections->first();
         
-        // جلب كل الشعب لنفس المدرسة أو الصف
+        // جلب كل الشعب لنفس المدرسة و الصف
         $availableClassSections = ClassSection::whereHas('grade', function ($query) use ($currentClassSection) {
             $query->where('school_id', $currentClassSection->grade->school_id);
-        })->get();
-
+        })->where('grade_id', $currentClassSection->grade_id)->get();
+        // dd($currentClassSection->grade->school_id);
         return view('student_assign.edit', compact('student', 'currentClassSection', 'availableClassSections'));
     }
 
@@ -65,12 +65,13 @@ class StudentClassSectionController extends Controller
         $request->validate([
             'class_section_id' => 'required|exists:class_sections,id',
         ]);
-
+        
         $student = User::role('student')->findOrFail($studentId);
-
+        
         // نفترض أن الطالب مسجل في شعبة واحدة فقط
-        $currentSection = $student->classSections()->first();
-
+        $currentSection = classSection::findOrFail($request->class_section_id);
+        
+        // dd($currentSection);
         // إزالة من الشعبة القديمة
         if ($currentSection) {
             $student->classSections()->detach($currentSection->id);
@@ -78,7 +79,7 @@ class StudentClassSectionController extends Controller
 
         // إضافة إلى الشعبة الجديدة
         $student->classSections()->attach($request->class_section_id, [
-            'academic_year_id' => $request->academic_year_id,
+            'academic_year_id' => $currentSection->grade->academic_year_id,
             'status' => 'active',
         ]);
 
