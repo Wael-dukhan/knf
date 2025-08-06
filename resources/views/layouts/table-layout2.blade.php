@@ -88,7 +88,7 @@
         <div class="main-content">
             @include('layouts.partials.sidebar')
             <div class="page-wrapper">
-                <div class="container-fluid mt-5">
+                <div class="container-fluid mt-5 custom-table">
                     @yield('content')
                 </div>
             </div>

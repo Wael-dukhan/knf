@@ -69,35 +69,71 @@ class TermController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'academic_year_id' => 'required|exists:academic_years,id',
-            'school_id' => 'required|exists:schools,id', // مدرسة واحدة فقط
+            'school_id' => 'required|exists:schools,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
-        
-        // تحقق من أن الفصل الدراسي بنفس الاسم غير مرتبط بالفعل بنفس المدرسة
+
+        $academicYear = AcademicYear::find($request->academic_year_id);
+        if (!$academicYear) {
+            return back()->withErrors(['academic_year_id' => __('السنة الدراسية المختارة غير موجودة')])
+                        ->withInput();
+        }
+
+        $yearStart = strtotime($academicYear->start_date);
+        $yearEnd = strtotime($academicYear->end_date);
+
+        $termStart = strtotime($request->start_date);
+        $termEnd = strtotime($request->end_date);
+
+        if ($termStart < $yearStart) {
+            return back()->withErrors(['start_date' => __('تاريخ بداية الفصل يجب ألا يكون قبل بداية السنة الدراسية')])
+                        ->withInput();
+        }
+
+        if ($termEnd > $yearEnd) {
+            return back()->withErrors(['end_date' => __('تاريخ نهاية الفصل يجب ألا يكون بعد نهاية السنة الدراسية')])
+                        ->withInput();
+        }
+
+        // تحقق عدم تداخل
+        $overlappingTerm = Term::where('school_id', $request->school_id)
+            ->where(function($query) use ($termStart, $termEnd) {
+                $query->whereBetween('start_date', [$termStart, $termEnd])
+                    ->orWhereBetween('end_date', [$termStart, $termEnd])
+                    ->orWhere(function($q) use ($termStart, $termEnd) {
+                        $q->where('start_date', '<=', $termStart)
+                            ->where('end_date', '>=', $termEnd);
+                    });
+            })
+            ->first();
+
+        if ($overlappingTerm) {
+            return back()->withErrors(['start_date' => __('تداخل مع فصل دراسي آخر في نفس المدرسة خلال نفس الفترة')])
+                        ->withInput();
+        }
+
         $existingTerm = Term::where('name', $request->name)
                             ->where('school_id', $request->school_id)
+                            ->where('academic_year_id', $request->academic_year_id)
                             ->first();
 
+
         if ($existingTerm) {
-            return back()->withErrors(['school_id' => __('هذا الفصل الدراسي مرتبط بهذه المدرسة بالفعل.')])
+            return back()->withErrors(['name' => __('يوجد فصل دراسي بنفس الاسم في نفس المدرسة ونفس السنة الدراسية بالفعل.')])
                         ->withInput();
         }
 
         $term = Term::create([
             'name' => $request->name,
             'academic_year_id' => $request->academic_year_id,
-            'school_id'=> $request->school_id,
-            'start_date' => strtotime($request->start_date),
-            'end_date' => strtotime($request->end_date),
+            'school_id' => $request->school_id,
+            'start_date' => $termStart,
+            'end_date' => $termEnd,
         ]);
-
-        // ربط الفصل الدراسي بالمدرسة المحددة
-        // $term->schools()->attach($request->school_id);
 
         return redirect()->route('admin.terms.index')->with('success', __('تم إضافة الفصل الدراسي بنجاح.'));
     }
-
 
     public function edit($id)
     {
@@ -122,7 +158,7 @@ class TermController extends Controller
 
     public function update(Request $request, Term $term)
     {
-        // التحقق من صحة البيانات
+        // التحقق من صحة البيانات الأساسية
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'school_id' => 'required|exists:schools,id',
@@ -130,8 +166,26 @@ class TermController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
-        $validated['start_date'] = strtotime($validated['start_date']);
-        $validated['end_date'] = strtotime($validated['end_date']);
+
+        // جلب السنة الدراسية المرتبطة
+        $academicYear = AcademicYear::find($validated['academic_year_id']);
+        if (!$academicYear) {
+            return back()->withErrors(['academic_year_id' => 'السنة الدراسية المختارة غير موجودة'])->withInput();
+        }
+
+        // تحويل تواريخ السنة الدراسية إلى timestamps للمقارنة
+        $yearStart = strtotime($academicYear->start_date);
+        $yearEnd = strtotime($academicYear->end_date);
+
+        // تحويل تواريخ البداية والنهاية للفصل الدراسي إلى timestamps
+        $termStart = strtotime($validated['start_date']);
+        $termEnd = strtotime($validated['end_date']);
+
+        // التحقق من أن تواريخ الفصل ضمن نطاق السنة الدراسية
+        if ($termStart < $yearStart || $termEnd > $yearEnd) {
+            return back()->withErrors(['start_date' => 'يجب أن تكون تواريخ البداية والنهاية ضمن نطاق السنة الدراسية المختارة'])
+                        ->withInput();
+        }
 
         // التحقق من عدم وجود تكرار لنفس الفصل الدراسي في نفس المدرسة
         $existingTerm = Term::where('id', '!=', $term->id)
@@ -144,11 +198,11 @@ class TermController extends Controller
                         ->withInput();
         }
 
-        // تحديث بيانات الفصل الدراسي
-        $term->update($validated);
+        // تحديث بيانات الفصل الدراسي (بعد تحويل التواريخ إلى timestamps)
+        $validated['start_date'] = $termStart;
+        $validated['end_date'] = $termEnd;
 
-        // تحديث المدرسة المرتبطة بالفصل الدراسي
-        // $term->schools()->sync([$request->school_id]);
+        $term->update($validated);
 
         return redirect()->route('admin.terms.index')->with('success', 'تم تحديث الفصل بنجاح');
     }
@@ -160,4 +214,21 @@ class TermController extends Controller
         $term->delete();
         return redirect()->route('admin.terms.index')->with('success', 'تم حذف الفصل بنجاح');
     }
+
+    public function getTermsByYear(Request $request, $yearId)
+    {
+        $schoolId = $request->query('school_id'); // نمرره عبر query string
+
+        if (!$schoolId) {
+            return response()->json(['error' => 'school_id is required'], 422);
+        }
+
+        $terms = Term::where('academic_year_id', $yearId)
+                    ->where('school_id', $schoolId)
+                    ->orderBy('start_date')
+                    ->get(['id', 'name']);
+
+        return response()->json($terms);
+    }
+
 }

@@ -48,18 +48,13 @@
 
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <label for="academic_year_id" class="form-label">
-                                {{ __('messages.select_academic_year') }}<span class="text-danger">*</span>
+                            <label class="form-label">
+                                {{ __('messages.academic_year') }} <span class="text-danger">*</span>
                             </label>
-                            <select name="academic_year_id" id="academic_year_id" class="form-select" required>
-                                <option value="">{{ __('messages.select_academic_year') }}</option>
-                                @foreach($academicYears as $year)
-                                    <option value="{{ $year->id }}" 
-                                        {{ old('academic_year_id', $assignment->academic_year_id) == $year->id ? 'selected' : '' }}>
-                                        {{ $year->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <p class="form-control-plaintext">
+                                {{ $assignment->academicYear->name ?? '-' }}
+                            </p>
+                            <input type="hidden" name="academic_year_id" value="{{ $assignment->academic_year_id }}">
                         </div>
 
                         <div class="col-md-6">

@@ -3,14 +3,14 @@
         <a href="{{ url('/') }}" class="logo">
             <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" />
         </a>
-        <a href="{{ url('/') }}" class="logo logo-small">
+        {{-- <a href="{{ url('/') }}" class="logo logo-small">
             <img
                 src="{{ asset('assets/img/logo-small.png') }}"
                 alt="Logo"
                 width="60"
                 height="60"
             />
-        </a>
+        </a> --}}
     </div>
 
     <div class="menu-toggle">
@@ -19,7 +19,7 @@
         </a>
     </div>
 
-    <div class="top-nav-search">
+    {{-- <div class="top-nav-search">
         <form method="POST" action="{{ route('logout') }}">
             <input
                 type="text"
@@ -31,7 +31,7 @@
                 <i class="fas fa-search"></i>
             </button>
         </form>
-    </div>
+    </div> --}}
 
     <a class="mobile_btn" id="mobile_btn">
         <i class="fas fa-bars"></i>
@@ -41,7 +41,7 @@
 
 
         <li class="nav-item dropdown noti-dropdown me-2">
-            <a
+            {{-- <a
                 href="#"
                 class="dropdown-toggle nav-link header-nav-list"
                 data-bs-toggle="dropdown"
@@ -50,7 +50,7 @@
                     src="{{ asset('assets/img/icons/header-icon-05.svg') }}"
                     alt=""
                 />
-            </a>
+            </a> --}}
             <div class="dropdown-menu notifications">
                 <div class="topnav-dropdown-header">
                     <span class="notification-title">Notifications</span>
@@ -135,7 +135,7 @@
                     </div>
                 </div>
                 <a class="dropdown-item" href="{{ route('profile.show') }}">My Profile</a>
-                <a class="dropdown-item" href="">Inbox</a>
+                {{-- <a class="dropdown-item" href="">Inbox</a> --}}
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                     @csrf
                 </form>

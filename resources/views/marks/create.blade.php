@@ -5,6 +5,15 @@
 @section('content')
 <div class="page-wrapper">
     <div class="container-fluid mt-5 card shadow-sm p-4 mb-4">
+        <style>
+            .d-flex.column-gap-10 {
+                column-gap: 10px;
+            }
+            a.btn.btn-secondary {
+                height: fit-content;
+                align-self: end;
+            }
+        </style>
         <h2 class="mb-4">{{ __('messages.marks.entry_form_title', ['material' => $material->name]) }}</h2>
         <div class="mb-3">
             <strong>{{ __('messages.school') }}:</strong> {{ $classSectionInfo->school_name }} - 
@@ -29,6 +38,16 @@
                 </div>
             @endif
             <input type="hidden" name="material_id" value="{{ $material->id }}">
+            {{-- <div class="mb-3">
+                <label for="term_id" class="form-label">{{ __('messages.term') }}</label>
+                <select name="term_id" id="term_id" class="form-select" required>
+                    @foreach($terms as $term)
+                        <option value="{{ $term->id }}" {{ old('term_id', $selectedTermId ?? '') == $term->id ? 'selected' : '' }}>
+                            {{ $term->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div> --}}
 
             <table id="marksTable" class="table table-bordered">
                 <thead>
@@ -94,8 +113,12 @@
                     @endforeach
                 </tbody>
             </table>
-
-            <button type="submit" class="btn btn-primary mt-2">{{ __('messages.marks.submit_button') }}</button>
+            <div class="d-flex column-gap-10">
+                <a href="{{ route('material-assignments.show', [$material->id]) }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> {{ __('messages.back') }}
+                </a>
+                <button type="submit" class="btn btn-primary mt-2">{{ __('messages.marks.submit_button') }}</button>
+            </div>
         </form>
     </div>
 </div>

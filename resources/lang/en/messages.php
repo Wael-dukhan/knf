@@ -179,6 +179,7 @@ return [
     'active' => 'Active',
     'inactive' => 'Inactive',
     'no_children' => 'No Childern',
+    'academic_year_not_active' => 'Academic year is not active.',
     'marks' => [
         'entry_form_title' => 'Marks Entry for :material',
         'student_name' => 'Student Name',

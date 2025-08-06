@@ -58,17 +58,21 @@ class UserController extends Controller
             // في حالة المشرف العام، يمكن عرض جميع الأدوار والمدارس
             $roles = Role::all()->skip(1); // تخطي دور "admin"
             $schools = School::all();
-        } else if ($role === 'school_manager') {
-            // في حالة مدير المدرسة، يمكن عرض الأدوار الخاصة بالمدرسة التي يديرها
-            $roles = Role::whereNotIn('name', ['super_admin', 'school_manager'])->get();
-            $schools = School::where('id', $user->school_id)->get();
+            $parents = User::role('parent')
+                // ->where('school_id', $user->school_id)
+                ->get();
+            } else if ($role === 'school_manager') {
+                // في حالة مدير المدرسة، يمكن عرض الأدوار الخاصة بالمدرسة التي يديرها
+                $roles = Role::whereNotIn('name', ['super_admin', 'school_manager'])->get();
+                $schools = School::where('id', $user->school_id)->get();
+                $parents = User::role('parent')->where('school_id', $user->school_id)->get(); // استرجاع الطلاب
+                // dd($user->school_id);
         } else {
             // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
             return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
         }
         // $roles = Role::all()->skip(1); // تخطي دور "admin"
         // $schools = School::all(); // جلب جميع المدارس
-        $parents = User::role('parent')->get(); // استرجاع الطلاب
         return view('users.create', compact('roles', 'schools', 'parents'));
     }
 
@@ -175,7 +179,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:6|confirmed',
+            'password' => 'nullable|string|min:6',
             'role_id' => 'required|exists:roles,id',
             'school_id' => 'required|exists:schools,id',
             'gender' => 'required|in:male,female'

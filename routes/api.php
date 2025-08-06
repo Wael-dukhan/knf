@@ -22,3 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::get('/schools/{schoolId}/academic-years', [SchoolController::class, 'getAcademicYears']);
+
+// طرق الـ AJAX للحصول على الفصول حسب السنة
+Route::get('/academic-years/{year}/terms', [\App\Http\Controllers\TermController::class, 'getTermsByYear'])
+    ->name('academic-years.terms');

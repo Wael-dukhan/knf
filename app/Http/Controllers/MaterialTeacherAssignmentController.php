@@ -42,17 +42,35 @@ class MaterialTeacherAssignmentController extends Controller
         return view('material_assignments.show', compact('classSection', 'materials', 'assignments','role'));
     }
 
-  public function edit(Request $request, $assignmentId)
-    {
+//   public function edit(Request $request, $assignmentId)
+//     {
 
+//         $assignment = MaterialTeacherAssignment::findOrFail($assignmentId);
+//         $schoolId = $assignment->classSection->grade->school_id;
+//         $teachers = User::role('teacher')->where('school_id',$schoolId)->get();
+//         $academicYears = AcademicYear::where('school_id',$schoolId)->get();
+//         $terms = Term::where('school_id',$schoolId)->get();
+//         // dd($assignment->classSection->grade);
+//         return view('material_assignments.edit', compact(
+//   'assignment', 'teachers', 'academicYears', 'terms'
+//         ));
+//     }
+
+    public function edit(Request $request, $assignmentId)
+    {
         $assignment = MaterialTeacherAssignment::findOrFail($assignmentId);
         $schoolId = $assignment->classSection->grade->school_id;
-        $teachers = User::role('teacher')->where('school_id',$schoolId)->get();
-        $academicYears = AcademicYear::where('school_id',$schoolId)->get();
-        $terms = Term::where('school_id',$schoolId)->get();
-        // dd($assignment->classSection->grade);
+
+        $teachers = User::role('teacher')->where('school_id', $schoolId)->get();
+        $academicYears = AcademicYear::where('school_id', $schoolId)->get();
+
+        // الفصول لكل المدرسة — سنستخدم فقط الفصول الخاصة بالسنة المحددة (للتهيئة)
+        $terms = Term::where('school_id', $schoolId)
+                    ->where('academic_year_id', $assignment->academic_year_id)
+                    ->get();
+
         return view('material_assignments.edit', compact(
-  'assignment', 'teachers', 'academicYears', 'terms'
+            'assignment', 'teachers', 'academicYears', 'terms', 'schoolId'
         ));
     }
 

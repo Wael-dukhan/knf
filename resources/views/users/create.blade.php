@@ -5,13 +5,19 @@
 @section('content')
 <div class="page-wrapper">
     <div class="content container-fluid">
-
+        <style>
+            span.select2-dropdown.select2-dropdown--below {
+                width: max-content!important;
+                background: white!important;
+            }
+            
+        </style>
         <!-- Page Header -->
         <div class="page-header">
             <div class="row align-items-center">
                 <div class="col">
                     <h3 class="page-title">{{ __('messages.create_user') }}</h3>
-                </div>
+                </div>  
             </div>
         </div>
 

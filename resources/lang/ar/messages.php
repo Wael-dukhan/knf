@@ -306,6 +306,8 @@ return [
     'term1_end' => 'نهاية الفصل الأول',
     'term2_start' => 'بداية الفصل الثاني',
     'term2_end' => 'نهاية الفصل الثاني',
+    'no_term_found' => 'لا يوجد فصل دراسي',
+    'academic_year_not_active' => 'السنة الدراسية غير نشطة.',
     'marks' => [
         'entry_form_title' => 'إدخال العلامات للمادة :material',
         'student_name' => 'اسم الطالب',

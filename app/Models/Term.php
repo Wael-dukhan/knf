@@ -42,18 +42,19 @@ class Term extends Model
         return $this->hasMany(MaterialUserTermSection::class);
     }
 
-    
     public static function currentTermId($schoolId = null)
     {
-        $today = time();
+        $today = time(); // timestamp عدد صحيح
 
         $query = Term::with('academicYear')
             ->where('start_date', '<=', $today)
-            ->where('end_date', '>=', $today);
-
-        if ($schoolId) {
-            $query->where('school_id', $schoolId);
-        }
+            ->where('end_date', '>=', $today)
+            ->whereHas('academicYear', function ($q) use ($schoolId) {
+                $q->where('status', 'active');
+                if ($schoolId) {
+                    $q->where('school_id', $schoolId);
+                }
+            });
 
         $term = $query->first();
 
@@ -65,13 +66,14 @@ class Term extends Model
         $today = time();
 
         $term = Term::where('start_date', '<=', $today)
-            ->where('end_date', '>=', $today);
-
-        if ($schoolId) {
-            $term->where('school_id', $schoolId);
-        }
-
-        $term = $term->first();
+            ->where('end_date', '>=', $today)
+            ->whereHas('academicYear', function ($q) use ($schoolId) {
+                $q->where('status', 'active');
+                if ($schoolId) {
+                    $q->where('school_id', $schoolId);
+                }
+            })
+            ->first();
 
         return $term ? $term->name : __('messages.section_info.no_current_term');
     }

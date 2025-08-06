@@ -3,7 +3,7 @@
 @section('title', __('messages.users_list'))
 
 @section('content')
-<div class="">
+<div class="custom-table-1">
     <div class="">
         <!-- Page Header -->
         <div class="mb-2">
@@ -86,7 +86,7 @@
                                 <td>{{ $user->created_at->format('Y-m-d') }}</td>
                                 <td class="text-end">
                                     <div class="actions">
-                                        <a href="{{ route('users.show', $user->id) }}" class="btn btn-sm bg-info-light me-2">
+                                        <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm bg-info-light me-2">
                                             <i class="feather-eye"></i> {{ __('messages.show') }}
                                         </a>
                                         <a href="{{ route('users.edit', $user) }}" class="btn btn-sm bg-warning-light me-2">

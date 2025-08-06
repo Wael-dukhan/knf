@@ -11311,3 +11311,8 @@ table.dataTable thead>tr>th.sorting, table.dataTable thead>tr>th.sorting_asc {
 /* span.select2-dropdown.select2-dropdown--below {
     width: max-content !important;
 } */
+@media screen and (min-width:600px) and (max-width:1200px){
+    html[dir="rtl"] .page-wrapper .container-fluid.mt-5.custom-table {
+        margin-right: 80px;
+    }
+}
