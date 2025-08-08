@@ -24,6 +24,7 @@ class GradeLevelController extends Controller
         $grades = Grade::with('academicYear')
                     ->where('school_id', $schoolId)
                     ->where('grade_level', $gradeLevelId)
+                    ->orderBy('academic_year_id', 'desc') // الأحدث أولاً
                     ->get();
 
         return view('grade_levels.show', compact('school', 'gradeLevel', 'grades'));

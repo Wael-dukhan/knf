@@ -36,14 +36,15 @@ class DatabaseSeeder extends Seeder
 
         // الشعب الدراسية
         $this->call(ClassSectionSeeder::class);
-
+        
         // الأنشطة
         $this->call(MaterialSeeder::class);
         
         $this->call(StudentClassSectionSeeder::class);
-
+        
         $this->call(AssignTeacherToMaterialInClassSectionSeeder::class);
-
+        
+        $this->call(MarksSeeder::class);
         // المستويات القرآنية
         $this->call(QuranLevelsSeeder::class);
 
@@ -52,6 +53,7 @@ class DatabaseSeeder extends Seeder
 
         // طلاب الحلقات القرآنية
         $this->call(StudentQuranClassesSeeder::class);
+        
 
     }
 }

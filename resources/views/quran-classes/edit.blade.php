@@ -52,6 +52,36 @@
             </select>
         </div>
 
+            
+        {{-- تاريخ البداية --}}
+        <div class="mb-3">
+            <label for="start_date" class="form-label">
+                {{ __('messages.start_date') }} <span class="text-danger">*</span>
+            </label>
+            <input type="date" name="start_date" id="start_date"
+                class="form-control @error('start_date') is-invalid @enderror"
+                value="{{ old('start_date', isset($quranClass) ? date('Y-m-d', $quranClass->start_date) : '') }}"
+                required>
+            @error('start_date')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        {{-- تاريخ النهاية --}}
+        <div class="mb-3">
+            <label for="end_date" class="form-label">
+                {{ __('messages.end_date') }} <span class="text-danger">*</span>
+            </label>
+            <input type="date" name="end_date" id="end_date"
+                class="form-control @error('end_date') is-invalid @enderror"
+                value="{{ old('end_date', isset($quranClass) ? date('Y-m-d', $quranClass->end_date) : '') }}"
+                required>
+            @error('end_date')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+
         {{-- الوصف (عربي أو إنجليزي) --}}
         <div class="form-group mb-3">
             <label for="description">{{ __('messages.description') }}</label>

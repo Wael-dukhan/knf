@@ -3,6 +3,16 @@
 @section('title', __('messages.class_section_details'))
 
 @section('content')
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <div class="">
     <!-- Page Header -->
     <div class="row align-items-center mb-3">

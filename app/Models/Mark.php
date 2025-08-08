@@ -13,6 +13,8 @@ class Mark extends Model
         'student_id',
         'material_id',
         'term_id',
+        'class_section_id',
+        'academic_year_id',
 
         'oral_mark',
         'homework_mark',
@@ -36,4 +38,20 @@ class Mark extends Model
     {
         return $this->belongsTo(Material::class);
     }
+
+    public function term()
+    {
+        return $this->belongsTo(\App\Models\Term::class);
+    }
+
+    public function classSection()
+    {
+        return $this->belongsTo(ClassSection::class, 'class_section_id');
+    }
+
+    public function academicYear()
+    {
+        return $this->belongsTo(academicYear::class, 'academic_year_id');
+    }
+
 }

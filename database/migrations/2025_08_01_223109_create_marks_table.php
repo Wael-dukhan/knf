@@ -14,6 +14,8 @@ class CreateMarksTable extends Migration
             $table->foreignId('student_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('material_id')->constrained('materials')->onDelete('cascade');
             $table->foreignId('term_id')->constrained('terms')->onDelete('cascade');
+            $table->foreignId('class_section_id')->constrained('class_sections')->onDelete('cascade');
+            $table->foreignId('academic_year_id')->constrained('academic_years')->onDelete('cascade');
 
             $table->decimal('oral_mark', 5, 2);           // المشاركة الشفوية (إن أردت إبقاؤه)
             $table->decimal('homework_mark', 5, 2);
@@ -26,7 +28,7 @@ class CreateMarksTable extends Migration
 
             $table->timestamps();
 
-            $table->unique(['student_id', 'material_id', 'term_id']);
+            $table->unique(['student_id', 'material_id', 'term_id','class_section_id','academic_year_id'],'marks_unique_combination');
         });
     }
 

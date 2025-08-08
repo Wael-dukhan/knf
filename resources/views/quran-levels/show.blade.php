@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="page-wrapper">
-    <div class="container mt-5">
+    <div class="container-fluid mt-5">
         <h2>{{ __('quran_levels.details') }}</h2>
 
         <div class="card shadow-sm p-4 mb-4">
@@ -60,6 +60,8 @@
                                 <th>{{ __('messages.teacher') }}</th>
                                 <th>{{ __('messages.description') }}</th>
                                 <th>{{ __('messages.student_count') }}</th>
+                                <th>{{ __('messages.start_date') }}</th>
+                                <th>{{ __('messages.end_date') }}</th>
                                 <th>{{ __('messages.actions') }}</th>
                             </tr>
                         </thead>
@@ -71,6 +73,8 @@
                                     <td>{{ $class->quranTeacher->name ?? '-' }}</td>
                                     <td>{{ $class->description ?? __('messages.no_description') }}</td>
                                     <td>{{ $class->student_count }}</td>
+                                    <td>{{ date('Y/m/d',$class->start_date) }}</td>
+                                    <td>{{ date('Y/m/d',$class->end_date) }}</td>
                                     <td>
                                         <a href="{{ route('quran_student_attendance.index', $class->id) }}" class="btn btn-sm btn-secondary">
                                             <i class="feather-users"></i> {{ __('messages.student_attendance_log') }}

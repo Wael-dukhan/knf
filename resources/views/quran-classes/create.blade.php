@@ -55,19 +55,6 @@
                 @enderror
             </div>
 
-            {{-- الوصف --}}
-            <div class="mb-3">
-                <label for="description" class="form-label">
-                    {{ __('messages.description') }}
-                </label>
-                <textarea name="description" id="description"
-                        class="form-control @error('description') is-invalid @enderror"
-                        rows="3">{{ old('description') }}</textarea>
-                @error('description')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-
             {{-- المعلم --}}
             <div class="mb-3">
                 <label for="teacher_id" class="form-label">
@@ -86,6 +73,46 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+            
+            {{-- تاريخ البداية --}}
+            <div class="mb-3">
+                <label for="start_date" class="form-label">
+                    {{ __('messages.start_date') }} <span class="text-danger">*</span>
+                </label>
+                <input type="date" name="start_date" id="start_date"
+                    class="form-control @error('start_date') is-invalid @enderror"
+                    value="{{ old('start_date') }}" required>
+                @error('start_date')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- تاريخ النهاية --}}
+            <div class="mb-3">
+                <label for="end_date" class="form-label">
+                    {{ __('messages.end_date') }} <span class="text-danger">*</span>
+                </label>
+                <input type="date" name="end_date" id="end_date"
+                    class="form-control @error('end_date') is-invalid @enderror"
+                    value="{{ old('end_date') }}" required>
+                @error('end_date')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- الوصف --}}
+            <div class="mb-3">
+                <label for="description" class="form-label">
+                    {{ __('messages.description') }}
+                </label>
+                <textarea name="description" id="description"
+                        class="form-control @error('description') is-invalid @enderror"
+                        rows="3">{{ old('description') }}</textarea>
+                @error('description')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
 
             <a href="{{ route('quran-classes.index') }}" class="btn btn-secondary">{{ __('messages.cancel') }}</a>
             <button type="submit" class="btn btn-primary">{{ __('messages.create') }}</button>

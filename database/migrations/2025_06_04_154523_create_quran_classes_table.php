@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('teacher_id')->constrained('users')->onDelete('cascade');
             // وصف الحلقة القرآنية
             $table->text('description')->nullable(); // وصف اختياري للحلقة
+            $table->date('start_date'); // تاريخ بداية السنة الدراسية
+            $table->date('end_date'); // تاريخ نهاية السنة الدراسية
             $table->softDeletes(); // حذف منطقي
             $table->timestamps();  // created_at و updated_at
         });

@@ -42,29 +42,34 @@ class QuranClassesController extends Controller
     // صفحة إنشاء حلقة جديدة
     public function create()
     {
-        // التحقق من صلاحية المستخدم
-        $user = auth()->user(); // الحصول على المستخدم الحالي
-        // الحصول على دور المستخدم
-        $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
-        // في حالة المشرف العام، يمكن عرض جميع مستويات القرآن
-        if ($role === 'super_admin') {
+        // if (auth()->check()) {
+
+            // التحقق من صلاحية المستخدم
+            $user = auth()->user(); // الحصول على المستخدم الحالي
+            // الحصول على دور المستخدم
+            $role = $user->getRoleNames()->first(); // افتراض أنه يوجد دور واحد فقط
             // في حالة المشرف العام، يمكن عرض جميع مستويات القرآن
-            $quranLevels = QuranLevel::all();
-            $teachers = User::role('quran_teacher')->get();
-            $schools = School::all();
-        } else if ($role === 'quran_supervisor') {
-            // في حالة مشرف القرآن، يمكن عرض مستويات القرآن الخاصة بالمدرسة التي يديرها
-            $quranLevels = QuranLevel::whereHas('school', function($query) use ($user) {
-                $query->where('id', $user->school_id);
-            })->get();
-            $teachers = User::role('quran_teacher')->where('school_id', $user->school_id)->get();
-            $schools = School::where('id', $user->school_id)->get();
-        } else {
-            // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
-            return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
-        }
-        // dd($quranLevels);
-        return view('quran-classes.create', compact('quranLevels', 'teachers', 'schools'));
+            if ($role === 'super_admin') {
+                // في حالة المشرف العام، يمكن عرض جميع مستويات القرآن
+                $quranLevels = QuranLevel::all();
+                $teachers = User::role('quran_teacher')->get();
+                $schools = School::all();
+            } else if ($role === 'quran_supervisor') {
+                // في حالة مشرف القرآن، يمكن عرض مستويات القرآن الخاصة بالمدرسة التي يديرها
+                $quranLevels = QuranLevel::whereHas('school', function($query) use ($user) {
+                    $query->where('id', $user->school_id);
+                })->get();
+                $teachers = User::role('quran_teacher')->where('school_id', $user->school_id)->get();
+                $schools = School::where('id', $user->school_id)->get();
+            } else {
+                // في حالة الأدوار الأخرى، يمكن إعادة توجيه المستخدم أو عرض رسالة خطأ
+                return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
+            }
+            // dd($quranLevels);
+            return view('quran-classes.create', compact('quranLevels', 'teachers', 'schools'));
+        // }else{
+        //         return redirect()->route('login'); // يعيد المستخدم إلى صفحة login
+        // }
     }
 
     // حفظ حلقة جديدة
@@ -75,12 +80,18 @@ class QuranClassesController extends Controller
             'description' => 'nullable|string|max:1000',
             'quran_level_id' => 'required|exists:quran_levels,id',
             'teacher_id' => 'required|exists:users,id', // Assuming teachers are users
+            'start_date' => 'required|date',  // تحقق من صحة التاريخ
+            'end_date' => 'required|date|after_or_equal:start_date',  // يجب أن يكون تاريخ النهاية مساويًا أو بعد تاريخ البداية
         ]);
-
+        // تحويل التواريخ إلى timestamps (integer)
+        // $validatedData['start_date'] = strtotime($validatedData['start_date']);
+        // $validatedData['end_date'] = strtotime($validatedData['end_date']);
+        // dd($validatedData);
+        
         // إذا التحقق تم بنجاح، ننشئ الحلقة القرآنية
         $quranClass = QuranClass::create($validatedData);
 
-        return redirect()->route('quran-classes.index')
+        return redirect()->route('quran-levels.show',$validatedData['quran_level_id'])
                         ->with('success', __('Quran class created successfully.'));
     }
 
@@ -112,6 +123,7 @@ class QuranClassesController extends Controller
     // صفحة تعديل حلقة
     public function edit(QuranClass $quranClass)
     {
+        // dd($quranClass);
         // التحقق من صلاحية المستخدم
         $user = auth()->user(); // الحصول على المستخدم الحالي
         // الحصول على دور المستخدم
@@ -146,8 +158,12 @@ class QuranClassesController extends Controller
             'quran_level_id' => 'required|exists:quran_levels,id',
             'teacher_id' => 'nullable|exists:users,id',
             'description' => 'nullable|string|max:1000',
+            'start_date' => 'required|date',  // تحقق من صحة التاريخ
+            'end_date' => 'required|date|after_or_equal:start_date',  // يجب أن يكون تاريخ النهاية مساويًا أو بعد تاريخ البداية
         ]);
-
+        // تحويل التواريخ إلى timestamps (integer)
+        // $validatedData['start_date'] = strtotime($validatedData['start_date']);
+        // $validatedData['end_date'] = strtotime($validatedData['end_date']);
         $quranClass->update($validatedData);
 
         return redirect()->route('quran-levels.show' , $quranClass->quranLevel->id)->with('success', 'تم تحديث بيانات الحلقة بنجاح');
@@ -158,7 +174,7 @@ class QuranClassesController extends Controller
     public function destroy(QuranClass $quranClass)
     {
         $quranClass->delete();
-        return redirect()->route('quran-classes.index')->with('success', 'Quran class deleted successfully.');
+        return redirect()->route('quran-levels.show',$quranClass->quran_level_id)->with('success', 'Quran class deleted successfully.');
     }
 
     // إضافة طالب إلى حلقة

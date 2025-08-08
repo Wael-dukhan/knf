@@ -19,6 +19,7 @@
             <strong>{{ __('messages.school') }}:</strong> {{ $classSectionInfo->school_name }} - 
             <strong>{{ __('messages.grade') }}:</strong> {{ $classSectionInfo->grade_name }}<br>
             <strong>{{ __('messages.academic_year') }}:</strong> {{ $classSectionInfo->academic_year_name }} - 
+            <strong>{{ __('messages.class_section') }}:</strong> {{ $classSectionInfo->name }} - 
             <strong>{{ __('messages.term') }}:</strong> {{ $termName }}
         </div>
 
@@ -38,6 +39,7 @@
                 </div>
             @endif
             <input type="hidden" name="material_id" value="{{ $material->id }}">
+            <input type="hidden" name="class_section_id" value="{{ $classSectionInfo->id }}">
             {{-- <div class="mb-3">
                 <label for="term_id" class="form-label">{{ __('messages.term') }}</label>
                 <select name="term_id" id="term_id" class="form-select" required>
@@ -114,7 +116,7 @@
                 </tbody>
             </table>
             <div class="d-flex column-gap-10">
-                <a href="{{ route('material-assignments.show', [$material->id]) }}" class="btn btn-secondary">
+                <a href="{{ route('material-assignments.show', [$classSectionInfo->id]) }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> {{ __('messages.back') }}
                 </a>
                 <button type="submit" class="btn btn-primary mt-2">{{ __('messages.marks.submit_button') }}</button>
@@ -123,7 +125,6 @@
     </div>
 </div>
 @endsection
-
 @push('scripts')
 <script>
 $(document).ready(function() {
@@ -137,18 +138,26 @@ $(document).ready(function() {
     });
 
     function calculateTotals(row) {
-        const oral = parseFloat($(row).find('input[name$="[oral]"]').val()) || 0;
-        const homework = parseFloat($(row).find('input[name$="[homework]"]').val()) || 0;
-        const firstStudy = parseFloat($(row).find('input[name$="[first_study]"]').val()) || 0;
-        const secondStudy = parseFloat($(row).find('input[name$="[second_study]"]').val()) || 0;
-        const oralExam = parseFloat($(row).find('input[name$="[oral_exam]"]').val()) || 0;
-        const writtenExam = parseFloat($(row).find('input[name$="[written_exam]"]').val()) || 0;
+        // قراءة القيم كأعداد صحيحة
+        const oral = parseInt($(row).find('input[name$="[oral]"]').val()) || 0;
+        const homework = parseInt($(row).find('input[name$="[homework]"]').val()) || 0;
+        const firstStudy = parseInt($(row).find('input[name$="[first_study]"]').val()) || 0;
+        const secondStudy = parseInt($(row).find('input[name$="[second_study]"]').val()) || 0;
+        const oralExam = parseInt($(row).find('input[name$="[oral_exam]"]').val()) || 0;
+        const writtenExam = parseInt($(row).find('input[name$="[written_exam]"]').val()) || 0;
 
-        const workTotal = (oral + homework + firstStudy + secondStudy) / 4;
-        const firstTermTotal = (workTotal + oralExam + writtenExam) / 3;
+        // 1. محصلة الأعمال (متوسط الأربعة × تقريب لأعلى)
+        const workTotal = Math.ceil((oral + homework + firstStudy + secondStudy) / 4);
 
-        $(row).find('.work-total').val(workTotal.toFixed(2));
-        $(row).find('.first-term-total').val(firstTermTotal.toFixed(2));
+        // 2. متوسط الامتحانين الشفهي والكتابي
+        const examsAverage = (oralExam + writtenExam) / 2;
+
+        // 3. النتيجة النهائية = محصلة الأعمال + متوسط الامتحانين (مقربة لأعلى)
+        const finalTotal = Math.ceil((workTotal + examsAverage)/2);
+
+        // عرض النتائج
+        $(row).find('.work-total').val(workTotal);
+        $(row).find('.first-term-total').val(finalTotal);
     }
 
     $('#marksTable tbody').on('input', '.mark-input', function() {

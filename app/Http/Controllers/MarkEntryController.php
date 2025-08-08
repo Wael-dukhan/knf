@@ -138,6 +138,7 @@ public function create(Request $request, $materialId, $sectionId)
         // التحقق من صحة الطلب
         $request->validate([
             'material_id' => 'required|exists:materials,id',
+            'class_section_id' => 'required|exists:class_sections,id',  // أضف هذا للتحقق من صحة الشعبة
             'marks' => 'required|array',
             'marks.*.oral' => 'nullable|numeric|min:0|max:100',
             'marks.*.homework' => 'nullable|numeric|min:0|max:100',
@@ -150,11 +151,11 @@ public function create(Request $request, $materialId, $sectionId)
         $material = Material::findOrFail($request->material_id);
         $schoolId = $material->grade->school_id;
         $termId = \App\Models\Term::currentTermId($schoolId);
+        $classSectionId = $request->class_section_id;
 
         if (!$termId) {
             return redirect()->back()->withErrors(['term_id' => 'لا يوجد فصل دراسي حالي مطابق لتاريخ اليوم.']);
         }
-
         foreach ($request->marks as $studentId => $markData) {
             $oral = floatval($markData['oral'] ?? 0);
             $homework = floatval($markData['homework'] ?? 0);
@@ -166,13 +167,14 @@ public function create(Request $request, $materialId, $sectionId)
             $workTotal = ($oral + $homework + $firstStudy + $secondStudy) / 4;
 
             // المجموع الكلي = متوسط (workTotal + oralExam + writtenExam)
-            $termTotal = ($workTotal + $oralExam + $writtenExam) / 3;
+            $termTotal = ($workTotal + ceil(($oralExam + $writtenExam) / 2 ) ) / 3;
 
             Mark::updateOrCreate(
                 [
                     'student_id' => $studentId,
                     'material_id' => $request->material_id,
                     'term_id' => $termId,
+                    'class_section_id' => $classSectionId,  // أضف شرط التحديث حسب الشعبة
                 ],
                 [
                     'oral_mark' => $oral,

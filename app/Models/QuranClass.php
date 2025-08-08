@@ -11,7 +11,7 @@ class QuranClass extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $fillable = ['name', 'quran_level_id', 'teacher_id', 'description'];
+    protected $fillable = ['name', 'quran_level_id', 'teacher_id', 'description','start_date','end_date'];
 
     /**
      * العلاقة مع المستوى القرآني.

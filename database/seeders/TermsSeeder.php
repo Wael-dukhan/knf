@@ -6,26 +6,49 @@ use Illuminate\Database\Seeder;
 use App\Models\Term;
 use App\Models\AcademicYear;
 use App\Models\School;
+use Carbon\Carbon;
 
 class TermsSeeder extends Seeder
 {
     public function run(): void
     {
         $schools = School::all();
-        $academicYears = AcademicYear::all();
 
         foreach ($schools as $school) {
-            foreach ($academicYears as $year) {
-                for ($i = 1; $i <= 2; $i++) {
+            $academicYears = AcademicYear::where('school_id', $school->id)->get();
 
-                    Term::create([
-                        'name' => "الفصل {$i} للسنة {$year->name}",
+            foreach ($academicYears as $year) {
+
+                // استخدم Carbon لتحديد التواريخ كنقاط فصلية
+                $startOfYear = Carbon::parse($year->start_date);
+                $midOfYear = $startOfYear->copy()->addMonths(4)->startOfDay();
+                $endOfYear = Carbon::parse($year->end_date);
+
+                // الفصل الأول: من بداية السنة الدراسية حتى منتصف السنة (4 أشهر)
+                Term::updateOrCreate(
+                    [
+                        'school_id' => $school->id,
                         'academic_year_id' => $year->id,
-                        'school_id'=> $school->id,
-                        'start_date' => time(),
-                        'end_date' => time() + 6*30*24*60*60,
-                    ]);
-                }
+                        'name' => "الفصل 1 للسنة {$year->name}",
+                    ],
+                    [
+                        'start_date' => $startOfYear->timestamp,
+                        'end_date' => $midOfYear->timestamp,
+                    ]
+                );
+
+                // الفصل الثاني: من منتصف السنة حتى نهاية السنة الدراسية
+                Term::updateOrCreate(
+                    [
+                        'school_id' => $school->id,
+                        'academic_year_id' => $year->id,
+                        'name' => "الفصل 2 للسنة {$year->name}",
+                    ],
+                    [
+                        'start_date' => $midOfYear->addDay()->timestamp, // يبدأ اليوم التالي لنهاية الفصل الأول
+                        'end_date' => $endOfYear->timestamp,
+                    ]
+                );
             }
         }
     }

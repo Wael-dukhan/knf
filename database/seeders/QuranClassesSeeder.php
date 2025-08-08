@@ -7,6 +7,8 @@ use App\Models\QuranClass;
 use App\Models\QuranLevel;
 use App\Models\User;
 use App\Models\School;
+use Carbon\Carbon;
+
 
 class QuranClassesSeeder extends Seeder
 {
@@ -28,6 +30,8 @@ class QuranClassesSeeder extends Seeder
                     'quran_level_id' => $level->id,
                     'teacher_id' => $teacher->id,
                     'description' => 'حلقة لحفظ وتلاوة القرآن في ' . $level->name,
+                    'start_date' => date('Y/m/d'),
+                    'end_date' => Carbon::now()->addMonths(4)->format('Y-m-d'),
                 ]);
             }
         }
