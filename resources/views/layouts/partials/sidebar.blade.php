@@ -207,12 +207,12 @@
                                 {{ __('messages.student_annual_report') }}
                                 </a>
                             </li>
-                            <li>
+                            {{-- <li>
                                 <a href="{{ route('reports.class_ranking') }}"
                                 class="{{ request()->routeIs('reports.class.rankings') ? 'active' : '' }}">
                                 {{ __('messages.class_ranking_report') }}
                                 </a>
-                            </li>
+                            </li> --}}
                             <li>
                                 <a href="{{ route('reports.attendance') }}"
                                 class="{{ request()->routeIs('reports.attendance') ? 'active' : '' }}">

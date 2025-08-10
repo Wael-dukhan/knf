@@ -193,7 +193,7 @@ Route::middleware(['auth'])->prefix('reports')->name('reports.')->group(function
     Route::get('/student-marks-report', [ReportController::class, 'studentMarksReport'])->name('student.marks_report');
     Route::get('/yearly-total-marks', [ReportController::class, 'yearlyTotalMarksReport'])->name('yearly_total_marks');
     Route::get('/yearly-total-marks/data', [ReportController::class, 'getYearlyTotalMarksAjax'])->name('yearly_total_marks_data');
-    Route::get('/class-ranking', [ReportController::class, 'classRanking'])->name('class_ranking');
+    // Route::get('/class-ranking', [ReportController::class, 'classRanking'])->name('class_ranking');
     Route::get('/attendance', [ReportController::class, 'attendance'])->name('attendance');
     Route::get('/overall-performance', [ReportController::class, 'overallPerformance'])->name('overall_performance');
     Route::get('/student/marks_report_data', [ReportController::class, 'marksReportData'])->name('student.marks_report_data');
