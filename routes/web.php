@@ -191,10 +191,14 @@ use App\Http\Controllers\ReportController;
 
 Route::middleware(['auth'])->prefix('reports')->name('reports.')->group(function () {
     Route::get('/student-marks-report', [ReportController::class, 'studentMarksReport'])->name('student.marks_report');
-    Route::get('/annual', [ReportController::class, 'annualReport'])->name('student.annual');
+    Route::get('/yearly-total-marks', [ReportController::class, 'yearlyTotalMarksReport'])->name('yearly_total_marks');
+    Route::get('/yearly-total-marks/data', [ReportController::class, 'getYearlyTotalMarksAjax'])->name('yearly_total_marks_data');
     Route::get('/class-ranking', [ReportController::class, 'classRanking'])->name('class_ranking');
     Route::get('/attendance', [ReportController::class, 'attendance'])->name('attendance');
     Route::get('/overall-performance', [ReportController::class, 'overallPerformance'])->name('overall_performance');
+    Route::get('/student/marks_report_data', [ReportController::class, 'marksReportData'])->name('student.marks_report_data');
+    Route::get('/student/terms', [ReportController::class, 'getTermAverageMarks'])->name('student.terms');
+    Route::get('/student/terms_report_data', [ReportController::class, 'getTermAverageMarksAjax'])->name('student.terms_report_data');
 });
 
 Route::get('/api/school/{school}/academic-years', [ReportController::class, 'getAcademicYears']);
@@ -204,5 +208,5 @@ Route::get('/api/academic-year/{year}/students', [ReportController::class, 'getS
 Route::get('/ajax/grades/{schoolId}', [ReportController::class, 'getGradesBySchool'])->name('ajax.grades.by.school');
 Route::get('/ajax/students/{schoolId}', [ReportController::class, 'getStudentsBySchool'])->name('ajax.students.by.school');
 Route::get('/ajax/materials/{gradeId}', [ReportController::class, 'getMaterialsByGrade'])->name('ajax.materials.by.grade');
-Route::get('/reports/student/marks_report_data', [ReportController::class, 'marksReportData'])->name('reports.student.marks_report_data');
 Route::get('/class-sections/{gradeId}', [ReportController::class, 'getClassSectionsByGrade']);
+

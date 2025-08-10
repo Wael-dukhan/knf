@@ -39,8 +39,8 @@ class GradeController extends Controller
         }
         // المراحل الدراسية الثلاث
         $gradeLevels  = Grade::GRADE_LEVELS;
-
-        return view('grades.create', compact('schools', 'academicYears', 'gradeLevels'));
+        $gradesNumber = Grade::getGrades();
+        return view('grades.create', compact('schools', 'academicYears', 'gradeLevels','gradesNumber'));
     }
 
 
@@ -61,6 +61,7 @@ class GradeController extends Controller
             'academic_year_id' => 'required|exists:academic_years,id',
             'description' => 'nullable|string|max:255',
             'grade_level' => 'required|in:1,2,3', // التأكد أن القيمة تكون واحدة من 1 أو 2 أو 3
+            'grade_number' => 'required|in:1,2,3,4,5,6,7,8,9,10,11,12'
         ]);
 
         Grade::create($request->all());
@@ -82,8 +83,10 @@ class GradeController extends Controller
         } else {
             return redirect()->route('dashboard')->with('error', 'ليس لديك صلاحية الوصول إلى هذه الصفحة.');
         }
+        $gradesNumber = Grade::getGrades();
+        $gradeLevels  = Grade::GRADE_LEVELS;
         // $academicYears = AcademicYear::all();
-        return view('grades.edit', compact('grade', 'academicYears'));
+        return view('grades.edit', compact('grade', 'academicYears','gradesNumber','gradeLevels'));
     }
 
     public function update(Request $request, Grade $grade)
@@ -95,6 +98,7 @@ class GradeController extends Controller
             'academic_year_id' => 'required|exists:academic_years,id',
             'description' => 'nullable|string|max:255',
             'grade_level' => 'required|in:1,2,3', // التأكد أن القيمة تكون واحدة من 1 أو 2 أو 3
+            'grade_number' => 'required|in:1,2,3,4,5,6,7,8,9,10,11,12'
         ]);
 
         // $grade->update($request->all());

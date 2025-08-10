@@ -93,6 +93,16 @@
             text-align: center;
             vertical-align: middle;
         }
+        div#marksTable_filter {
+            display: inline;
+        }
+        div#marksTable_length {
+            display: inline;
+            padding: 15px;
+        }
+        div.dataTables_wrapper {
+            padding-top: 15px;
+        }
     </style>
 
     @stack('styles')

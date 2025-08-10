@@ -23,6 +23,24 @@ class Grade extends Model
         2 => 'المرحلة الإعدادية',
         3 => 'المرحلة الثانوية',
     ];
+
+    public static function getGrades()
+    {
+        return [
+            1  => __('messages.grades.1'),
+            2  => __('messages.grades.2'),
+            3  => __('messages.grades.3'),
+            4  => __('messages.grades.4'),
+            5  => __('messages.grades.5'),
+            6  => __('messages.grades.6'),
+            7  => __('messages.grades.7'),
+            8  => __('messages.grades.8'),
+            9  => __('messages.grades.9'),
+            10 => __('messages.grades.10'),
+            11 => __('messages.grades.11'),
+            12 => __('messages.grades.12'),
+        ];
+    }
     
     public function academicYear()
     {

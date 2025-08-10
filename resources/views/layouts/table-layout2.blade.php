@@ -81,6 +81,7 @@
         nav.navbar.navbar-expand-lg.navbar-light.bg-white.shadow-sm .container {
             column-gap: 10px;
         }
+
     </style>
 
     @include('layouts.partials.header')

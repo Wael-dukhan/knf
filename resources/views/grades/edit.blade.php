@@ -47,15 +47,30 @@
                 <label for="grade_level" class="form-label">المستوى الدراسي <span class="text-danger">*</span></label>
                 <select name="grade_level" id="grade_level" class="form-select @error('grade_level') is-invalid @enderror" required>
                     <option value="">-- اختر المستوى --</option>
-                    <option value="1" {{ old('grade_level', $grade->grade_level) == "1" ? 'selected' : '' }}>1</option>
-                    <option value="2" {{ old('grade_level', $grade->grade_level) == "2" ? 'selected' : '' }}>2</option>
-                    <option value="3" {{ old('grade_level', $grade->grade_level) == "3" ? 'selected' : '' }}>3</option>
+                    @foreach ($gradeLevels as $index => $gradeLevel)
+                        <option value="{{ $index }}" {{ old('grade_level', $grade->grade_level) == $index ? 'selected' : '' }}>{{$gradeLevel}}</option>
+                    @endforeach
                 </select>
                 @error('grade_level')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
+                        {{-- اسم المرحلة --}}
+            <div class="mb-3">
+                <label for="name" class="form-label">
+                    {{ __('messages.grade') }} <span class="text-danger">*</span>
+                </label>
+                <select name="grade_number" id="grade_number" class="form-select @error('grade_number') is-invalid @enderror" required>
+                    <option value="">{{__('messages.select_grade')}}</option>
+                    @foreach ($gradesNumber as $index => $gradeNumber)
+                        <option value="{{ $index }}" {{ old('grade_number', $grade->grade_number) == $index ? 'selected' : '' }}>{{$gradeNumber}}</option>
+                    @endforeach
+                </select>
+                @error('grade_number')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
             <a href="{{ route('grade_levels.show',[$grade->school_id , $grade->grade_level]) }}" class="btn btn-secondary">{{ __('messages.cancel') }}</a>
             <button type="submit" class="btn btn-primary">{{ __('messages.update') }}</button>

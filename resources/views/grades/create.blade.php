@@ -73,6 +73,22 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+            
+            {{-- اسم المرحلة --}}
+            <div class="mb-3">
+                <label for="name" class="form-label">
+                    {{ __('messages.grade') }} <span class="text-danger">*</span>
+                </label>
+                <select name="grade_number" id="grade_number" class="form-select @error('grade_number') is-invalid @enderror" required>
+                    <option value="">{{__('messages.select_grade')}}</option>
+                    @foreach ($gradesNumber as $index => $gradeNumber)
+                        <option value="{{ $index }}">{{$gradeNumber}}</option>
+                    @endforeach
+                </select>
+                @error('grade_number')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
             {{-- اسم المرحلة --}}
             <div class="mb-3">

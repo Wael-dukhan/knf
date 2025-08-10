@@ -1,6 +1,6 @@
 @extends('layouts.reports')
 
-@section('title', __('messages.student_grades_report_in_materials'))
+@section('title', __('messages.student_terms_report'))
 
 @section('content')
 <div class="mt-4">
@@ -35,9 +35,10 @@
             }
         }
     </style>
-    <h3 class="mb-4 fw-bold text-primary">{{ __('messages.student_grades_report_in_materials') }}</h3>
 
-    {{-- فلاتر البحث الرئيسية --}}
+    <h3 class="mb-4 fw-bold text-primary">{{ __('messages.student_terms_report') }}</h3>
+
+    {{-- فلاتر البحث --}}
     <div class="row g-3 align-items-end mb-4">
         <div class="col-md-2">
             <label class="form-label fw-semibold">{{ __('messages.school') }}</label>
@@ -80,16 +81,7 @@
             <select id="class_section_id" class="form-select select2">
                 <option value="">{{ __('messages.select_class_section') }}</option>
                 @foreach($classSections as $classSection)
-                    <option value="{{ $classSection->id }}">{{ $classSection->grade->school->name }} - {{ $classSection->grade->name }} - {{ $classSection->name }} [  {{ $classSection->grade->academicYear->name }} ]</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-md-2">
-            <label class="form-label fw-semibold">{{ __('messages.material') }}</label>
-            <select id="material_id" class="form-select select2">
-                <option value="">{{ __('messages.select_material') }}</option>
-                @foreach($materials as $material)
-                    <option value="{{ $material->id }}">{{ $material->grade->school->name }} - {{ $material->grade->name }} - {{ $material->name }} - {{ $material->grade->academicYear->name }}</option>
+                    <option value="{{ $classSection->id }}">{{ $classSection->grade->school->name }} - {{ $classSection->grade->name }} - {{ $classSection->name }} [{{ $classSection->grade->academicYear->name }}]</option>
                 @endforeach
             </select>
         </div>
@@ -104,10 +96,10 @@
         </div>
     </div>
 
-    {{-- جدول عرض النتائج --}}
+    {{-- جدول عرض التقرير --}}
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
-            <table class="table table-bordered table-striped table-hover align-middle" id="marksTable" style="min-width:1300px;">
+            <table class="table table-bordered table-striped table-hover align-middle" id="termsTable" style="min-width:1000px;">
                 <thead class="table-primary text-center align-middle">
                     <tr>
                         <th>#</th>
@@ -115,17 +107,9 @@
                         <th>{{ __('messages.school') }}</th>
                         <th>{{ __('messages.grade') }}</th>
                         <th>{{ __('messages.class_section') }}</th>
-                        <th>{{ __('messages.subject') }}</th>
                         <th>{{ __('messages.academic_year') }}</th>
                         <th>{{ __('messages.term') }}</th>
-                        <th>{{ __('messages.oral_mark') }}</th>
-                        <th>{{ __('messages.homework_mark') }}</th>
-                        <th>{{ __('messages.first_study_mark') }}</th>
-                        <th>{{ __('messages.second_study_mark') }}</th>
-                        <th>{{ __('messages.work_total') }}</th>
-                        <th>{{ __('messages.oral_exam_mark') }}</th>
-                        <th>{{ __('messages.written_exam_mark') }}</th>
-                        <th>{{ __('messages.term_total') }}</th>
+                        <th>{{ __('messages.average_score') }}</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -140,20 +124,24 @@
     $(document).ready(function() {
         $('.select2').select2({ width: '100%' });
 
-        var table = $('#marksTable').DataTable({
+        var table = $('#termsTable').DataTable({
             processing: true,
             serverSide: true,
             ajax: {
-                url: '{{ route("reports.student.marks_report_data") }}',
+                url: '{{ route("reports.student.terms_report_data") }}',
                 data: function(d) {
                     d.school_id = $('#school_id').val();
                     d.academic_year_id = $('#academic_year_id').val();
                     d.term_id = $('#term_id').val();
                     d.grade_id = $('#grade_id').val();
                     d.class_section_id = $('#class_section_id').val();
-                    d.material_id = $('#material_id').val();
                     d.student_id = $('#student_id').val();
-                }
+                    console.log(d.academic_year_id);
+                },
+                dataSrc: function(json) {
+                    console.log('Ajax Response:', json); // طباعة استجابة السيرفر في الكونسول
+                    return json.data; // مهم أن تعيد الصفوف لـ DataTables
+                },
             },
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
@@ -161,17 +149,9 @@
                 { data: 'school_name', name: 'school_name' },
                 { data: 'grade_name', name: 'grade_name' },
                 { data: 'class_section_name', name: 'class_section_name' },
-                { data: 'material_name', name: 'material_name' },
                 { data: 'academic_year_name', name: 'academic_year_name' },
                 { data: 'term_name', name: 'term_name' },
-                { data: 'oral_mark', name: 'oral_mark' },
-                { data: 'homework_mark', name: 'homework_mark' },
-                { data: 'first_study_mark', name: 'first_study_mark' },
-                { data: 'second_study_mark', name: 'second_study_mark' },
-                { data: 'work_total', name: 'work_total' },
-                { data: 'oral_exam_mark', name: 'oral_exam_mark' },
-                { data: 'written_exam_mark', name: 'written_exam_mark' },
-                { data: 'term_total', name: 'term_total' }
+                { data: 'average_score', name: 'average_score' }
             ],
             order: [[1, 'asc']],
             lengthMenu: [[10, 25, 50], [10, 25, 50]],
@@ -186,15 +166,14 @@
                     next: "<i class='fa fa-chevron-left'></i>"
                 }
             },
-            responsive: true,
-             dom: 'Bfltip',  // مكان ظهور الأزرار: Buttons + filter + length + table + info + pagination
+            dom: 'Bfltip',
             buttons: [
                 {
                     extend: 'excelHtml5',
                     text: '{{ __("messages.export_excel") }}',
                     className: 'btn btn-success btn-sm',
                     exportOptions: {
-                        columns: ':visible:not(:first-child)' // استثناء عمود الأرقام التسلسلية لو تريد
+                        columns: ':visible:not(:first-child)'
                     }
                 },
                 {
@@ -203,7 +182,6 @@
                     orientation: 'landscape',
                     pageSize: 'A4',
                     exportOptions: {
-                        //columns: ':visible:not(:last-child)'
                         columns: ':visible'
                     },
                     customize: function (doc) {
@@ -220,14 +198,13 @@
                             .css('text-align', 'right')
                             .find('table')
                             .addClass('table table-bordered');
-
-                        // $(win.document.body).find('table th:last-child, table td:last-child').css('display', 'none');
                     }
                 }
             ]
         });
-        console.log(window.innerWidth);
-        $('#school_id, #academic_year_id, #term_id, #grade_id, #class_section_id, #material_id, #student_id').change(function() {
+
+        $('#school_id, #academic_year_id, #term_id, #grade_id, #class_section_id, #student_id').change(function() {
+            console.log('Academic year changed:', $(this).val());
             table.ajax.reload();
         });
     });

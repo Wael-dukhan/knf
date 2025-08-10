@@ -35,6 +35,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>{{ __('messages.grade_name') }}</th>
+                                <th>{{ __('messages.name') }}</th>
                                 <th>{{ __('messages.school_name') }}</th>
                                 <th>{{ __('messages.academic_year') }}</th>
                                 <th class="text-end">{{ __('messages.actions') }}</th>
@@ -48,6 +49,9 @@
                                     <input type="text" id="schoolSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}">
                                 </th>
                                 <th>
+                                    <input type="text" id="gradeNumberSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}">
+                                </th>
+                                <th>
                                     <input type="text" id="academicYearSearch" class="form-control form-control-sm" placeholder="{{ __('messages.search') }}">
                                 </th>
                                 <th></th>
@@ -58,6 +62,7 @@
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $grade->name }}</td>
+                                    <td>{{ App\Models\Grade::getGrades()[$grade->grade_number] }}</td>
                                     <td>{{ $grade->school->name ?? '-' }}</td>
                                     <td>{{ $grade->academicYear->name }}</td>
                                     <td class="text-end">

@@ -148,18 +148,180 @@ class ReportController extends Controller
             ->make(true);
     }
 
+    protected function buildTermAverageMarksQuery(array $filters = [])
+    {
+        $query = DB::table('student_term_total_marks')
+            ->join('users', 'users.id', '=', 'student_term_total_marks.student_id')
+            ->join('grades', 'grades.id', '=', 'student_term_total_marks.grade_id')
+            ->join('schools', 'schools.id', '=', 'student_term_total_marks.school_id')
+            ->join('terms', 'terms.id', '=', 'student_term_total_marks.term_id')
+            ->join('academic_years', 'academic_years.id', '=', 'student_term_total_marks.academic_year_id')
+            ->join('class_sections', 'student_term_total_marks.class_section_id', '=', 'class_sections.id')
+            ->select(
+                'student_term_total_marks.class_section_id',
+                'student_term_total_marks.average_score',
+                'terms.name as term_name',
+                'academic_years.name as academic_year_name',
+                'class_sections.name as class_section_name',
+                'student_term_total_marks.student_id',
+                'users.name as student_name',
+                'grades.name as grade_name',
+                'schools.name as school_name'
+            );
+
+        // تطبيق الفلاتر لو موجودة
+        if (!empty($filters['school_id'])) {
+            $query->where('student_term_total_marks.school_id', $filters['school_id']);
+        }
+        if (!empty($filters['academic_year_id'])) {
+            $query->where('student_term_total_marks.academic_year_id', $filters['academic_year_id']);
+        }
+        if (!empty($filters['term_id'])) {
+            $query->where('student_term_total_marks.term_id', $filters['term_id']);
+        }
+        if (!empty($filters['grade_id'])) {
+            $query->where('student_term_total_marks.grade_id', $filters['grade_id']);
+        }
+        if (!empty($filters['class_section_id'])) {
+            $query->where('student_term_total_marks.class_section_id', $filters['class_section_id']);
+        }
+        if (!empty($filters['student_id'])) {
+            $query->where('student_term_total_marks.student_id', $filters['student_id']);
+        }
+
+        return $query;
+    }
+
+    // دالة Ajax ترجع بيانات DataTables
+    public function getTermAverageMarksAjax(Request $request)
+    {
+        $filters = [
+            'school_id'       => $request->input('school_id'),
+            'academic_year_id'=> $request->input('academic_year_id'),
+            'term_id'         => $request->input('term_id'),
+            'grade_id'        => $request->input('grade_id'),
+            'class_section_id'=> $request->input('class_section_id'),
+            'student_id'      => $request->input('student_id'),
+        ];
+
+        $query = $this->buildTermAverageMarksQuery($filters);
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->make(true);
+    }
+
+    // دالة عرض الصفحة مع تحميل الفلاتر والقيم الافتراضية
+    public function getTermAverageMarks($schoolId = null, $academicYearId = null, $termId = null, $gradeId = null, $classSectionId = null, $studentId = null)
+    {
+        $filters = compact('schoolId', 'academicYearId', 'termId', 'gradeId', 'classSectionId', 'studentId');
+
+        // لتحميل بيانات الفلاتر لعرضها في الصفحة
+        $schools       = School::orderBy('name')->get();
+        $academicYears = AcademicYear::orderBy('name')->get();
+        $terms         = Term::orderBy('name')->get();
+        $grades        = Grade::orderBy('name')->get();
+        $classSections = ClassSection::orderBy('name')->get();
+
+        $students = DB::table('users')
+            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->where('roles.name', 'student')
+            ->orderBy('users.name')
+            ->select('users.id', 'users.name')
+            ->get();
+
+        // ** لا تجلب البيانات هنا مباشرة للعرض، لأن البيانات تأتي من Ajax **
+
+        return view('reports.student_terms_report', compact(
+            'schools', 'academicYears', 'terms', 'grades', 'students', 'classSections',
+            'schoolId', 'academicYearId', 'termId', 'gradeId', 'classSectionId', 'studentId'
+        ));
+    }
     public function getClassSectionsByGrade($gradeId)
     {
         $sections = ClassSection::where('grade_id', $gradeId)->orderBy('name')->get();
         return response()->json($sections);
     }
 
-    /**
-     * تقرير المحصلة السنوية للطالب
-     */
-    public function annualReport()
+    // استعلام بناء المحصلة السنوية مع الفلاتر
+    protected function buildYearlyTotalMarksQuery(array $filters = [])
     {
-        return view('reports.annual_report');
+        $query = DB::table('student_yearly_total_marks')
+            ->join('users', 'users.id', '=', 'student_yearly_total_marks.student_id')
+            ->join('grades', 'grades.id', '=', 'student_yearly_total_marks.grade_id')
+            ->join('schools', 'schools.id', '=', 'student_yearly_total_marks.school_id')
+            ->join('academic_years', 'academic_years.id', '=', 'student_yearly_total_marks.academic_year_id')
+            ->join('class_sections', 'class_sections.id', '=', 'student_yearly_total_marks.class_section_id')
+            ->select(
+                'student_yearly_total_marks.id',
+                'users.name as student_name',
+                'schools.name as school_name',
+                'grades.name as grade_name',
+                'class_sections.name as class_section_name',
+                'academic_years.name as academic_year_name',
+                'student_yearly_total_marks.total_score',
+                'student_yearly_total_marks.average_score',
+                'student_yearly_total_marks.material_count'
+            );
+
+        // تطبيق الفلاتر إذا وجدت
+        if (!empty($filters['school_id'])) {
+            $query->where('student_yearly_total_marks.school_id', $filters['school_id']);
+        }
+        if (!empty($filters['academic_year_id'])) {
+            $query->where('student_yearly_total_marks.academic_year_id', $filters['academic_year_id']);
+        }
+        if (!empty($filters['grade_id'])) {
+            $query->where('student_yearly_total_marks.grade_id', $filters['grade_id']);
+        }
+        if (!empty($filters['class_section_id'])) {
+            $query->where('student_yearly_total_marks.class_section_id', $filters['class_section_id']);
+        }
+        if (!empty($filters['student_id'])) {
+            $query->where('student_yearly_total_marks.student_id', $filters['student_id']);
+        }
+
+        return $query;
+    }
+
+    // دالة Ajax ترجع بيانات المحصلة السنوية
+    public function getYearlyTotalMarksAjax(Request $request)
+    {
+        $filters = [
+            'school_id'       => $request->input('school_id'),
+            'academic_year_id'=> $request->input('academic_year_id'),
+            'grade_id'        => $request->input('grade_id'),
+            'class_section_id'=> $request->input('class_section_id'),
+            'student_id'      => $request->input('student_id'),
+        ];
+
+        $query = $this->buildYearlyTotalMarksQuery($filters);
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->make(true);
+    }
+
+    // دالة عرض صفحة التقرير مع الفلاتر
+    public function yearlyTotalMarksReport()
+    {
+        $schools       = School::orderBy('name')->get();        
+        $academicYears = AcademicYear::with('school')->orderBy('name')->get();
+        $grades = Grade::with('school')->orderBy('name')->get();
+        $classSections = ClassSection::with(['grade'])->orderBy('name')->get();
+
+        $students      = DB::table('users')
+            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->where('roles.name', 'student')
+            ->orderBy('users.name')
+            ->select('users.id', 'users.name')
+            ->get();
+
+        return view('reports.yearly_total_marks_report', compact(
+            'schools', 'academicYears', 'grades', 'classSections', 'students'
+        ));
     }
 
     /**

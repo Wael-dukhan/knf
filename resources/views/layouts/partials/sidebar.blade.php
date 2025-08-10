@@ -192,12 +192,18 @@
                             <li>
                                 <a href="{{ route('reports.student.marks_report') }}"
                                 class="{{ request()->routeIs('reports.student.grades') ? 'active' : '' }}">
-                                {{ __('messages.student_grades_report') }}
+                                {{ __('messages.student_grades_report_in_materials') }}
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('reports.student.annual') }}"
-                                class="{{ request()->routeIs('reports.student.annual') ? 'active' : '' }}">
+                                <a href="{{ route('reports.student.terms') }}"
+                                class="{{ request()->routeIs('reports.student.terms') ? 'active' : '' }}">
+                                {{ __('messages.student_terms_report') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('reports.yearly_total_marks') }}"
+                                class="{{ request()->routeIs('reports.yearly_total_marks') ? 'active' : '' }}">
                                 {{ __('messages.student_annual_report') }}
                                 </a>
                             </li>

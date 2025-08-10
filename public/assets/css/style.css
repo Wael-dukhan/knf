@@ -2636,9 +2636,9 @@ html.menu-opened {
     overflow: hidden
 }
 
-html.menu-opened body {
+/* html.menu-opened body {
     overflow: hidden
-}
+} */
 
 .top-nav-search {
     float: left;
@@ -11315,4 +11315,8 @@ table.dataTable thead>tr>th.sorting, table.dataTable thead>tr>th.sorting_asc {
     html[dir="rtl"] .page-wrapper .container-fluid.mt-5.custom-table {
         margin-right: 80px;
     }
+}
+
+html.menu-opened body {
+    overflow: auto !important;
 }
