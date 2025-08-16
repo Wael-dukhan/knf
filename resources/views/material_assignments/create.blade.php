@@ -11,7 +11,7 @@
             <div class="card-body">
                 <p class="mb-0"><strong>{{ __('messages.school') }}:</strong> {{ $classSection->grade->school->name ?? '-' }}</p>
                 <hr />
-                <p class="mb-1"><strong>{{ __('messages.grade_level') }}:</strong> {{ $classSection->grade->grade_level }}</p>
+                <p class="mb-1"><strong>{{ __('messages.grade_level') }}:</strong> {{ App\Models\Grade::GRADE_LEVELS[$classSection->grade->grade_level] }}</p>
                 <hr />
                 <p class="mb-1"><strong>{{ __('messages.grade') }}:</strong> {{ $classSection->grade->name }}</p>
                 <hr />

@@ -152,7 +152,9 @@
     
     document.addEventListener('DOMContentLoaded', function () {
         const roleSelect = document.getElementById('role');
+        const schoolSelect = document.getElementById('school');
         const parentField = document.getElementById('parentField');
+        let parent = $('#parent_id'); 
         // const academicYearField = document.getElementById('academicYearField');
 
         function toggleStudentFields() {
@@ -167,8 +169,46 @@
                 // academicYearField.style.display = 'none';
             }
         }
+        function toggleSchoolFields() {
+            const selectSchool = schoolSelect.value;
+
+            if (!selectSchool) {
+                console.log("لم يتم اختيار مدرسة");
+                return;
+            }
+
+            fetch(`/knf/public/get-parents-for-school/${selectSchool}`, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "X-Requested-With": "XMLHttpRequest", // يوضح أنه طلب Ajax
+                    // "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content') // في حال كان POST
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+
+                console.log("قائمة أولياء الأمور:", data);
+                // هنا تقدر تملي select أو table بالبيانات
+                parent.empty(); 
+                // أضف العناصر للقائمة
+                parent.append('<option value="">اختر ولي أمر</option>');
+
+                if (data.length === 0) {
+                    parent.append('<option value="">لا يوجد أولياء أمور</option>');
+                } else {
+                    $.each(data, function(index, parentData) {
+                        parent.append(`<option value="${parentData.id}">${parentData.name}</option>`);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("حدث خطأ:", error);
+            });
+        }
 
         roleSelect.addEventListener('change', toggleStudentFields);
+        schoolSelect.addEventListener('change', toggleSchoolFields);
         toggleStudentFields(); // Initial check on load
     });
     $(document).ready(function() {

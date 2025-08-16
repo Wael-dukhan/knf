@@ -210,6 +210,8 @@ return [
     'material_count' => 'material count',
     'yearly_report_title' => 'yearly report title',
     'yearly_average_score' => 'yearly average score',
+    'recorded_by' => 'Recorded By',
+    'student_attendance_report' => 'Student Attendance Report',
     'grades' => [
             1  => 'First Grade',
             2  => 'Second Grade',

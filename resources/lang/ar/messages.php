@@ -334,6 +334,8 @@ return [
     'yearly_average_score' => 'المحصلة السنوية',
     'material_count' => 'عدد المواد',
     'yearly_report_title' => 'تقرير المحصلة السنوية',
+    'recorded_by' => 'تم التعيين بواسطة',
+    'student_attendance_report' => 'تقرير الحضور و الغياب للطلاب',
     'grades' => [
         1  => 'الصف الأول',
         2  => 'الصف الثاني',

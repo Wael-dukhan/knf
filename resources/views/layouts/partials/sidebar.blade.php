@@ -214,8 +214,8 @@
                                 </a>
                             </li> --}}
                             <li>
-                                <a href="{{ route('reports.attendance') }}"
-                                class="{{ request()->routeIs('reports.attendance') ? 'active' : '' }}">
+                                <a href="{{ route('reports.student.attendance') }}"
+                                class="{{ request()->routeIs('reports.student.attendance') ? 'active' : '' }}">
                                 {{ __('messages.attendance_report') }}
                                 </a>
                             </li>

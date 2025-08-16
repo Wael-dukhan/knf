@@ -12,7 +12,7 @@
                 </p>
                 <hr />
                 <p class="mb-1">
-                    <strong>{{ __('messages.grade_level') }}:</strong> {{ $assignment->classSection->grade->grade_level }}
+                    <strong>{{ __('messages.grade_level') }}:</strong> {{ App\Models\Grade::GRADE_LEVELS[$assignment->classSection->grade->grade_level] }}
                 </p>
                 <hr />
                 <p class="mb-1">

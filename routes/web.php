@@ -30,6 +30,7 @@ use App\Http\Controllers\QuranTeacherAttendanceController;
 use App\Http\Controllers\QuranStudentAttendanceController;
 use App\Http\Controllers\ParentController;
 use App\Http\Controllers\MarkEntryController;
+use App\Http\Controllers\FilteredController;
 
 /*
 |--------------------------------------------------------------------------
@@ -194,7 +195,11 @@ Route::middleware(['auth'])->prefix('reports')->name('reports.')->group(function
     Route::get('/yearly-total-marks', [ReportController::class, 'yearlyTotalMarksReport'])->name('yearly_total_marks');
     Route::get('/yearly-total-marks/data', [ReportController::class, 'getYearlyTotalMarksAjax'])->name('yearly_total_marks_data');
     // Route::get('/class-ranking', [ReportController::class, 'classRanking'])->name('class_ranking');
-    Route::get('/attendance', [ReportController::class, 'attendance'])->name('attendance');
+    Route::get('attendance', [ReportController::class, 'attendanceReport'])
+        ->name('student.attendance');
+
+    Route::get('attendance/data', [ReportController::class, 'attendanceReportData'])
+        ->name('student.attendance_report_data');
     Route::get('/overall-performance', [ReportController::class, 'overallPerformance'])->name('overall_performance');
     Route::get('/student/marks_report_data', [ReportController::class, 'marksReportData'])->name('student.marks_report_data');
     Route::get('/student/terms', [ReportController::class, 'getTermAverageMarks'])->name('student.terms');
@@ -210,3 +215,12 @@ Route::get('/ajax/students/{schoolId}', [ReportController::class, 'getStudentsBy
 Route::get('/ajax/materials/{gradeId}', [ReportController::class, 'getMaterialsByGrade'])->name('ajax.materials.by.grade');
 Route::get('/class-sections/{gradeId}', [ReportController::class, 'getClassSectionsByGrade']);
 
+Route::get('/get-parents-for-school/{school}', [ParentController::class, 'getParents']);
+
+
+Route::get('/filters/academic-years/{school}', [FilteredController::class, 'academicYears'])->name('filters.academic-years');
+Route::get('/filters/terms/{academicYear}', [FilteredController::class, 'terms'])->name('filters.terms');
+Route::get('/filters/grades/{school}/{year}', [FilteredController::class, 'grades'])->name('filters.grades');
+Route::get('/filters/class-sections/{grade}', [FilteredController::class, 'classSections'])->name('filters.class-sections');
+Route::get('/filters/materials/{grade}', [FilteredController::class, 'materials'])->name('filters.materials');
+Route::get('/filters/students/{classSection}', [FilteredController::class, 'students'])->name('filters.students');

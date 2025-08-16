@@ -27,6 +27,10 @@
                         <th>{{ __('messages.role') }}</th>
                         <td>{{ $firstRole ? __('messages.'.$firstRole) : __('messages.not_assigned') }}</td>
                     </tr>
+                    <tr>
+                        <th>{{ __('messages.school') }}</th>
+                        <td>{{ $user->school->name }}</td>
+                    </tr>
 
                     @if($firstRole === 'student')
                     <tr>

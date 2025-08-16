@@ -103,6 +103,11 @@
         div.dataTables_wrapper {
             padding-top: 15px;
         }
+        @media screen and (min-width:1200px) and (max-width:1600px){
+            .mini-sidebar div#sidebar {
+                display: none !important;
+            }
+        }
     </style>
 
     @stack('styles')

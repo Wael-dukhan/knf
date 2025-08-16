@@ -185,6 +185,67 @@ $(document).ready(function() {
     $('#school_id, #academic_year_id, #grade_id, #class_section_id, #student_id').on('change', function() {
         table.ajax.reload();
     });
+
+    // dependent filters
+        $('#school_id').change(function() {
+            let schoolId = $(this).val();
+            $('#academic_year_id').html('<option>{{ __("messages.loading") }}</option>').val('');
+            $('#grade_id, #class_section_id, #student_id').html('<option value="">--</option>');
+
+            if(schoolId) {
+                $.get("{{ url('filters/academic-years') }}/" + schoolId, function(data) {
+                    $('#academic_year_id').html('<option value="">{{ __("messages.select_academic_year") }}</option>');
+                    $.each(data, function(i, item){
+                        $('#academic_year_id').append('<option value="'+item.id+'">'+item.name+'</option>');
+                    });
+                });
+            }
+        });
+
+        $('#academic_year_id').change(function() {
+            let schoolId = $('#school_id').val();
+            let yearId = $(this).val();
+            $('#grade_id').html('<option>{{ __("messages.loading") }}</option>').val('');
+            $('#class_section_id, #student_id').html('<option value="">--</option>');
+
+            if(schoolId && yearId) {
+                $.get("{{ url('/filters/grades/') }}/" + schoolId + '/' + yearId, function(data) {
+                    $('#grade_id').html('<option value="">{{ __("messages.select_grade") }}</option>');
+                    $.each(data, function(i, item){
+                        $('#grade_id').append('<option value="'+item.id+'">'+item.name+'</option>');
+                    });
+                });
+            }
+        });
+
+        $('#grade_id').change(function() {
+            let gradeId = $(this).val();
+            $('#class_section_id').html('<option>{{ __("messages.loading") }}</option>').val('');
+            $('#student_id').html('<option value="">--</option>');
+
+            if(gradeId) {
+                $.get("{{ url('/filters/class-sections/') }}/" + gradeId, function(data) {
+                    $('#class_section_id').html('<option value="">{{ __("messages.select_class_section") }}</option>');
+                    $.each(data, function(i, item){
+                        $('#class_section_id').append('<option value="'+item.id+'">'+item.name+'</option>');
+                    });
+                });
+            }
+        });
+
+        $('#class_section_id').change(function() {
+            let sectionId = $(this).val();
+            $('#student_id').html('<option>{{ __("messages.loading") }}</option>').val('');
+
+            if(sectionId) {
+                $.get("{{ url('/filters/students/') }}/" + sectionId, function(data) {
+                    $('#student_id').html('<option value="">{{ __("messages.select_student") }}</option>');
+                    $.each(data, function(i, item){
+                        $('#student_id').append('<option value="'+item.id+'">'+item.name+'</option>');
+                    });
+                });
+            }
+        });
 });
 </script>
 @endpush

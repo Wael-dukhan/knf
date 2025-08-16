@@ -82,22 +82,30 @@ class UserController extends Controller
         // التحقق من أن هناك مديرًا في نفس المدرسة
         if ($request->role_id == 2 && User::where('school_id', $request->school_id)
             ->whereHas('roles', function ($query) {
-        $query->where('name', 'manager');
-    })->exists()) {
-        return redirect()->back()->withErrors(['school_id' => 'هناك مدير موجود بالفعل لهذه المدرسة.']);
-    }
-    
-    // التحقق من صحة البيانات
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|string|min:6',
-        'role_id' => 'required|exists:roles,id',
-        'school_id' => 'required|exists:schools,id', // تأكيد أن المدرسة موجودة
-        'gender' => 'required|in:male,female'
-    ]);
-    
-    // dd($request->all());
+            $query->where('name', 'manager');
+        })->exists()) {
+            return redirect()->back()->withErrors(['school_id' => 'هناك مدير موجود بالفعل لهذه المدرسة.']);
+        }
+        
+        // التحقق من صحة البيانات
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'role_id' => 'required|exists:roles,id',
+            'school_id' => 'required|exists:schools,id', // تأكيد أن المدرسة موجودة
+            'gender' => 'required|in:male,female',
+        ]);
+        
+        $role = Role::findById($request->role_id);
+        // if ($role->name == 'student') {
+        //     $x = $request->validate([
+        //         'parent_id' => 'required|exists:users,id',
+        //     ]);
+        //                 $parentId = $request->parent_id;
+
+        //     dd($parentId);
+        // }
         // إنشاء المستخدم الجديد
         $user = User::create([
             'name' => $request->name,
@@ -108,11 +116,10 @@ class UserController extends Controller
         ]);
 
         // تعيين الدور للمستخدم باستخدام laravel-permission
-        $role = Role::findById($request->role_id);
         $user->assignRole($role);
 
         
-        if ($request->role_id == 4) {
+        if ($role->name == 'student') {
             $request->validate([
                 'parent_id' => 'required|exists:users,id',
             ]);

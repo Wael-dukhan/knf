@@ -60,7 +60,7 @@
             </label>
             <input type="date" name="start_date" id="start_date"
                 class="form-control @error('start_date') is-invalid @enderror"
-                value="{{ old('start_date', isset($quranClass) ? date('Y-m-d', $quranClass->start_date) : '') }}"
+                value="{{ old('start_date', isset($quranClass) ? $quranClass->start_date : '') }}"
                 required>
             @error('start_date')
                 <div class="invalid-feedback">{{ $message }}</div>
@@ -74,7 +74,7 @@
             </label>
             <input type="date" name="end_date" id="end_date"
                 class="form-control @error('end_date') is-invalid @enderror"
-                value="{{ old('end_date', isset($quranClass) ? date('Y-m-d', $quranClass->end_date) : '') }}"
+                value="{{ old('end_date', isset($quranClass) ? $quranClass->end_date : '') }}"
                 required>
             @error('end_date')
                 <div class="invalid-feedback">{{ $message }}</div>

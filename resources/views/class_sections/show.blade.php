@@ -82,7 +82,7 @@
             @endif
 
             <div class="mt-4">
-                <a href="{{ route('admin.grades.show', $class_section->id) }}" class="btn btn-secondary mt-3">
+                <a href="{{ route('admin.grades.show', $class_section->grade_id) }}" class="btn btn-secondary mt-3">
                     <i class="feather-arrow-left"></i> {{ __('messages.back') }}
                 </a>
             </div>

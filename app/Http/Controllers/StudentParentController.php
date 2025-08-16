@@ -55,6 +55,7 @@ public function index()
         if ($role === 'super_admin') {
             $students = User::role('student')->get(); // العثور على جميع الطلاب
             $parents = User::role('parent')->get(); // استرجاع أولياء الأمور
+            
         } else if ($role === 'school_manager') {
             // في حالة مدير المدرسة، يمكن عرض الطلاب وأولياء الأمور الخاصين بالمدرسة التي يديرها
             $students = User::role('student')

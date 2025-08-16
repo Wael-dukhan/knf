@@ -29,7 +29,7 @@
                 <select name="student_id" id="student_id" class="form-control select2 @error('student_id') is-invalid @enderror" required>
                     <option value="">{{ __('messages.select_student') }}</option>
                     @foreach($students as $student)
-                        <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
+                        <option value="{{ $student->id }}" data-school-id="{{ $student->school_id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
                             {{ $student->name }}
                         </option>
                     @endforeach
@@ -91,6 +91,47 @@
                 inputTooShort: () => "{{ app()->getLocale() == 'ar' ? 'الرجاء كتابة المزيد' : 'Please enter more characters' }}"
             }
         });
+        var studentSelect = $('#student_id'); 
+        let parent = $('#parent_id'); 
+        function toggleSchoolFields() {
+            const selectSchool = studentSelect.find(':selected').data('school-id');
+
+            if (!selectSchool) {
+                console.log("لم يتم اختيار مدرسة");
+                return;
+            }
+
+            fetch(`/knf/public/get-parents-for-school/${selectSchool}`, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "X-Requested-With": "XMLHttpRequest", // يوضح أنه طلب Ajax
+                    // "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content') // في حال كان POST
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+
+                console.log("قائمة أولياء الأمور:", data);
+                // هنا تقدر تملي select أو table بالبيانات
+                parent.empty(); 
+                // أضف العناصر للقائمة
+                parent.append('<option value="">اختر ولي أمر</option>');
+
+                if (data.length === 0) {
+                    parent.append('<option value="">لا يوجد أولياء أمور</option>');
+                } else {
+                    $.each(data, function(index, parentData) {
+                        parent.append(`<option value="${parentData.id}">${parentData.name}</option>`);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("حدث خطأ:", error);
+            });
+        }
+        studentSelect.on('change', toggleSchoolFields);
+
     });
 </script>
 @endpush

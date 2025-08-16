@@ -89,7 +89,7 @@ class UserManagementController extends Controller
 
         $educationHistory = collect($educationHistoryArray);
         // $user = auth()->user();
-        $user = User::with(['school', 'parents'])->findOrFail($id);
+        // $user = User::with(['school', 'parents'])->findOrFail($id);
         $roles = $user->getRoleNames();  // Collection of role names
         $firstRole = $roles->first();    // أول دور
         // dd($firstRole);

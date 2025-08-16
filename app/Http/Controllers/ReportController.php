@@ -331,15 +331,84 @@ class ReportController extends Controller
     {
         return view('reports.class_ranking');
     }
-
-    /**
-     * تقرير الحضور والغياب
+  /**
+     * صفحة تقرير الحضور والغياب
      */
-    public function attendance()
+    public function attendanceReport()
     {
-        return view('reports.attendance');
+        $schools = School::all();
+        $academicYears = AcademicYear::with('school')->get();
+        $terms = Term::with('school')->get();
+        $grades = Grade::with(['school','academicYear'])->get();
+        $classSections = ClassSection::with(['grade.school','grade.academicYear'])->get();
+        $students = \App\Models\User::role('student')->get();
+
+        return view('reports.attendance', compact('schools','academicYears','terms','grades','classSections','students'));
     }
 
+    /**
+     * بيانات تقرير الحضور والغياب (DataTables Ajax)
+     */
+    public function attendanceReportData(Request $request)
+    {
+        $query = \App\Models\StudentAttendanceRecord::query()
+            ->with([
+                'student', 
+                'classSection.grade.school',
+                'classSection.grade.academicYear',
+                'term',
+                'recordedBy'
+            ]);
+
+        // فلترة حسب الفلاتر
+        if ($request->school_id) {
+            $query->whereHas('classSection.grade.school', function($q) use ($request) {
+                $q->where('id', $request->school_id);
+            });
+        }
+        if ($request->academic_year_id) {
+            $query->whereHas('classSection.grade.academicYear', function($q) use ($request) {
+                $q->where('id', $request->academic_year_id);
+            });
+        }
+        if ($request->term_id) {
+            $query->where('term_id', $request->term_id);
+        }
+        if ($request->grade_id) {
+            $query->whereHas('classSection.grade', function($q) use ($request) {
+                $q->where('id', $request->grade_id);
+            });
+        }
+        if ($request->class_section_id) {
+            $query->where('class_section_id', $request->class_section_id);
+        }
+        if ($request->student_id) {
+            $query->where('user_id', $request->student_id);
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->editColumn('student_name', fn($row) => $row->student?->name ?? '-')
+            ->editColumn('school_name', fn($row) => $row->classSection?->grade?->school?->name ?? '-')
+            ->editColumn('grade_name', fn($row) => $row->classSection?->grade?->name ?? '-')
+            ->editColumn('class_section_name', fn($row) => $row->classSection?->name ?? '-')
+            ->editColumn('academic_year_name', fn($row) => $row->classSection?->grade?->academicYear?->name ?? '-')
+            ->editColumn('term_name', fn($row) => $row->term?->name ?? '-')
+            ->editColumn('date', fn($row) => $row->date ?? '-')
+            ->editColumn('status', function($row) {
+                return match($row->status) {
+                    'present' => '<span class="badge bg-success">'.__('messages.present').'</span>',
+                    'absent'  => '<span class="badge bg-danger">'.__('messages.absent').'</span>',
+                    'late'    => '<span class="badge bg-warning">'.__('messages.late').'</span>',
+                    'excused' => '<span class="badge bg-info">'.__('messages.excused').'</span>',
+                    default   => $row->status,
+                };
+            })
+            ->editColumn('notes', fn($row) => $row->notes ?? '-')
+            ->editColumn('recorded_by_name', fn($row) => $row->recordedBy?->name ?? '-')
+            ->rawColumns(['status']) // حتى تظهر الـ badges ملونة
+            ->make(true);
+    }
     /**
      * التقرير العام لأداء الطالب
      */

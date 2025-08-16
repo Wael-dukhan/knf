@@ -230,6 +230,93 @@
         $('#school_id, #academic_year_id, #term_id, #grade_id, #class_section_id, #material_id, #student_id').change(function() {
             table.ajax.reload();
         });
+        $(document).ready(function() {
+    $('.select2').select2({ width: '100%' });
+
+    // عند تغيير المدرسة
+    $('#school_id').change(function() {
+        let schoolId = $(this).val();
+        $('#academic_year_id').empty().append('<option value="">اختر السنة الدراسية</option>');
+        $('#grade_id').empty().append('<option value="">اختر الصف</option>');
+        $('#class_section_id').empty().append('<option value="">اختر الشعبة</option>');
+        $('#material_id').empty().append('<option value="">اختر المادة</option>');
+        $('#student_id').empty().append('<option value="">اختر الطالب</option>');
+
+        if (schoolId) {
+            $.get("{{ route('filters.academic-years', ':id') }}".replace(':id', schoolId), function(data) {
+                data.forEach(function(item) {
+                    $('#academic_year_id').append(`<option value="${item.id}">${item.name}</option>`);
+                });
+            });
+        }
+    });
+
+    // عند تغيير السنة الدراسية
+    $('#academic_year_id').change(function() {
+        let academicYearId = $(this).val();
+        let schoolId = $('#school_id').val();
+
+        $('#term_id').empty().append('<option value="">اختر الفصل</option>');
+        $('#grade_id').empty().append('<option value="">اختر الصف</option>');
+        $('#class_section_id').empty().append('<option value="">اختر الشعبة</option>');
+        $('#material_id').empty().append('<option value="">اختر المادة</option>');
+        $('#student_id').empty().append('<option value="">اختر الطالب</option>');
+
+        if (academicYearId) {
+            $.get("{{ route('filters.terms', ':id') }}".replace(':id', academicYearId), function(data) {
+                data.forEach(function(item) {
+                    $('#term_id').append(`<option value="${item.id}">${item.name}</option>`);
+                });
+            });
+
+            $.get("{{ route('filters.grades', [':school', ':year']) }}"
+                .replace(':school', schoolId)
+                .replace(':year', academicYearId), function(data) {
+                data.forEach(function(item) {
+                    $('#grade_id').append(`<option value="${item.id}">${item.name}</option>`);
+                });
+            });
+        }
+    });
+
+    // عند تغيير الصف
+    $('#grade_id').change(function() {
+        let gradeId = $(this).val();
+
+        $('#class_section_id').empty().append('<option value="">اختر الشعبة</option>');
+        $('#material_id').empty().append('<option value="">اختر المادة</option>');
+        $('#student_id').empty().append('<option value="">اختر الطالب</option>');
+
+        if (gradeId) {
+            $.get("{{ route('filters.class-sections', ':id') }}".replace(':id', gradeId), function(data) {
+                data.forEach(function(item) {
+                    $('#class_section_id').append(`<option value="${item.id}">${item.name}</option>`);
+                });
+            });
+
+            $.get("{{ route('filters.materials', ':id') }}".replace(':id', gradeId), function(data) {
+                data.forEach(function(item) {
+                    $('#material_id').append(`<option value="${item.id}">${item.name}</option>`);
+                });
+            });
+        }
+    });
+
+    // عند تغيير الشعبة
+    $('#class_section_id').change(function() {
+        let sectionId = $(this).val();
+        $('#student_id').empty().append('<option value="">اختر الطالب</option>');
+
+        if (sectionId) {
+            $.get("{{ route('filters.students', ':id') }}".replace(':id', sectionId), function(data) {
+                data.forEach(function(item) {
+                    $('#student_id').append(`<option value="${item.id}">${item.name}</option>`);
+                });
+            });
+        }
+    });
+});
+
     });
 </script>
 @endpush

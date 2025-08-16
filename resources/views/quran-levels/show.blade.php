@@ -73,8 +73,8 @@
                                     <td>{{ $class->quranTeacher->name ?? '-' }}</td>
                                     <td>{{ $class->description ?? __('messages.no_description') }}</td>
                                     <td>{{ $class->student_count }}</td>
-                                    <td>{{ date('Y/m/d',$class->start_date) }}</td>
-                                    <td>{{ date('Y/m/d',$class->end_date) }}</td>
+                                    <td>{{ $class->start_date }}</td>
+                                    <td>{{ $class->end_date }}</td>
                                     <td>
                                         <a href="{{ route('quran_student_attendance.index', $class->id) }}" class="btn btn-sm btn-secondary">
                                             <i class="feather-users"></i> {{ __('messages.student_attendance_log') }}
