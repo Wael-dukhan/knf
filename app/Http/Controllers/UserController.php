@@ -260,12 +260,12 @@ class UserController extends Controller
     public function showCurrentUser()
     {
         $user = auth()->user();
-
+        
         // تحميل المدرسة فقط (علاقة عامة)
         $user->load('school');
-
         $roles = $user->getRoleNames();
         $firstRole = $roles->first();
+        // dd($firstRole);
 
         // فقط إذا كان الدور "طالب" نقوم بجلب ولي الأمر والسجل التعليمي
         if ($firstRole === 'student') {
