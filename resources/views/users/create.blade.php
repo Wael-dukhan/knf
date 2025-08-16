@@ -10,7 +10,9 @@
                 width: max-content!important;
                 background: white!important;
             }
-            
+            span.select2-dropdown.select2-dropdown--above {
+                width: 200px !important;
+            }
         </style>
         <!-- Page Header -->
         <div class="page-header">
@@ -177,7 +179,7 @@
                 return;
             }
 
-            fetch(`/knf/public/get-parents-for-school/${selectSchool}`, {
+            fetch(`{{url('/get-parents-for-school')}}/${selectSchool}`, {
                 method: "GET",
                 headers: {
                     "Accept": "application/json",

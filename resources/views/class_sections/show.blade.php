@@ -143,7 +143,7 @@
                 var newStatus = $(this).val();
                 // console.log(newStatus);
                 $.ajax({
-                url: '/knf/public/students/' + studentId + '/update-status',
+                url: "{{ url('/students/') }}/" + studentId + '/update-status',
                 method: 'POST',
                 data: {
                     status: newStatus,
